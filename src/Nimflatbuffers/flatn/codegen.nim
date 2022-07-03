@@ -1,15 +1,16 @@
 # TODO: Invertir orden de Prepend de las estructuras
 # TODO: Averiguar porque no lee la información correctamente
-import std/[os, macros]
+import system except NimNode
+import std/[os]
+import cdecl/compiler/macros2
 
 from std/sequtils import toSeq
 from std/strutils import split, replace, contains, parseInt, join
 from std/algorithm import reverse, reversed
 
-import ../utils/util
-import ../parser/[nodes, Parser]
-import ../lexer/[Lexer, tokenKind]
-
+import utils/util
+import parser/[nodes, Parser]
+import lexer/[Lexer, tokenKind]
 
 var
    structs {.compileTime.} : seq[Node]
@@ -302,16 +303,14 @@ proc newStruct(node: Node): seq[string] =
       mutatorProcs.add "\n"
       if typ notin BasicNimTypes:
          if typ in toSeq(unions.names):
-            echo "ERROR IN FIELD: [", field, "]"
-            echo "INVALID TYPE: [", typ, "] SKIPPING..."
             mutatorProcs.add("# SKIPPED FIELD, " & field & " of type " & typ)
          else:
-            mutatorProcs.add newStructGetterT(objName[1].strVal, field, typ, off).stringify
+            mutatorProcs.add newStructGetterT(objName[1].strVals, field, typ, off).stringify
             mutatorProcs.add "\n"
-            mutatorProcs.add newStructSetter(objName[1].strVal, field, typ, off).stringify
+            mutatorProcs.add newStructSetter(objName[1].strVals, field, typ, off).stringify
       else:
-         mutatorProcs.add newStructGetter(objName[1].strVal, field, typ, off).stringify
-         mutatorProcs.add newStructSetter(objName[1].strVal, field, typ, off).stringify
+         mutatorProcs.add newStructGetter(objName[1].strVals, field, typ, off).stringify
+         mutatorProcs.add newStructSetter(objName[1].strVals, field, typ, off).stringify
 
    result.add nnkTypeSection.newTree(nnkTypeDef.newTree(objName, newEmptyNode(), objType)).stringify
    result.add "\n\n"
@@ -847,14 +846,14 @@ proc newTable(node: Node): seq[string] =
       if child.children[1].kind == nkOpenArray:
          if typ notin BasicNimTypes:
             mutatorProcs.add "\n"
-            mutatorProcs.add newTableArrayGetter(objName[1].strVal, field, "uoffset", off, child.children[1].inlineSize, size).stringify
+            mutatorProcs.add newTableArrayGetter(objName[1].strVals, field, "uoffset", off, child.children[1].inlineSize, size).stringify
             mutatorProcs.add "\n"
-            mutatorProcs.add newTableArrayLength(objName[1].strVal, field, "uoffset", off).stringify
+            mutatorProcs.add newTableArrayLength(objName[1].strVals, field, "uoffset", off).stringify
          else:
             mutatorProcs.add "\n"
-            mutatorProcs.add newTableArrayGetter(objName[1].strVal, field, typ, off, child.children[1].inlineSize, size).stringify
+            mutatorProcs.add newTableArrayGetter(objName[1].strVals, field, typ, off, child.children[1].inlineSize, size).stringify
             mutatorProcs.add "\n"
-            mutatorProcs.add newTableArrayLength(objName[1].strVal, field, typ, off).stringify
+            mutatorProcs.add newTableArrayLength(objName[1].strVals, field, typ, off).stringify
       else:
          var hasDefault: bool = false
          if "|" in typ: # only support default values for basic types, so we dont need to check for non basic types
@@ -865,38 +864,38 @@ proc newTable(node: Node): seq[string] =
          if typ notin BasicNimTypes and not hasDefault:
             if typ in toSeq(unions.names):
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableUnionTypeGetter(objName[1].strVal, field, typ & "Type", off).stringify
+               mutatorProcs.add newTableUnionTypeGetter(objName[1].strVals, field, typ & "Type", off).stringify
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableUnionTypeSetter(objName[1].strVal, field, typ & "Type", off).stringify
+               mutatorProcs.add newTableUnionTypeSetter(objName[1].strVals, field, typ & "Type", off).stringify
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableUnionGetter(objName[1].strVal, field, "uoffset", off).stringify
+               mutatorProcs.add newTableUnionGetter(objName[1].strVals, field, "uoffset", off).stringify
                #mutatorProcs.add "\n"
-               #mutatorProcs.add newTableUnionSetter(objName[1].strVal, field, getName(enums, typ).enumType, slo).stringify
+               #mutatorProcs.add newTableUnionSetter(objName[1].strVals, field, getName(enums, typ).enumType, slo).stringify
             elif typ in toSeq(enums.namesE):
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableGetter(objName[1].strVal, field, getName(enums, typ).enumType, off).stringify
+               mutatorProcs.add newTableGetter(objName[1].strVals, field, getName(enums, typ).enumType, off).stringify
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableSetter(objName[1].strVal, field, getName(enums, typ).enumType, off).stringify
+               mutatorProcs.add newTableSetter(objName[1].strVals, field, getName(enums, typ).enumType, off).stringify
             elif typ in toSeq(structs.names):
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableGetterS(objName[1].strVal, field, typ, off).stringify
+               mutatorProcs.add newTableGetterS(objName[1].strVals, field, typ, off).stringify
                # TODO: make this only added when --gen-mutable is passed (and also allow for --gen-mutable to be passed :p )
                #mutatorProcs.add "\n"
-               #mutatorProcs.add newTableSetter(objName[1].strVal, field, typ, off).stringify
+               #mutatorProcs.add newTableSetter(objName[1].strVals, field, typ, off).stringify
             else:
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableGetterT(objName[1].strVal, field, typ, off).stringify
+               mutatorProcs.add newTableGetterT(objName[1].strVals, field, typ, off).stringify
                # TODO: make this only added when --gen-mutable is passed (and also allow for --gen-mutable to be passed :p )
                #mutatorProcs.add "\n"
-               #mutatorProcs.add newTableSetter(objName[1].strVal, field, typ, off).stringify
+               #mutatorProcs.add newTableSetter(objName[1].strVals, field, typ, off).stringify
          else:
             if typ == "string":
-               mutatorProcs.add newTableStringGetter(objName[1].strVal, field, typ, off).stringify
+               mutatorProcs.add newTableStringGetter(objName[1].strVals, field, typ, off).stringify
             else:
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableGetter(objName[1].strVal, field, typ, off).stringify
+               mutatorProcs.add newTableGetter(objName[1].strVals, field, typ, off).stringify
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableSetter(objName[1].strVal, field, typ, off).stringify
+               mutatorProcs.add newTableSetter(objName[1].strVals, field, typ, off).stringify
 
    result.add nnkTypeSection.newTree(nnkTypeDef.newTree(objName, newEmptyNode(), objType)).stringify
    result.add "\n\n"
@@ -906,26 +905,26 @@ proc newTable(node: Node): seq[string] =
    for field, typ, off, slo, size, child in node.fieldTypeSlots:
       result.add "\n"
       if child.children[1].kind == nkOpenArray:
-         result.add newTableArrayAdder(objName[1].strVal, field, "uoffset", slo).stringify
+         result.add newTableArrayAdder(objName[1].strVals, field, "uoffset", slo).stringify
          result.add "\n"
-         result.add newTableArrayStarter(objName[1].strVal, field,
+         result.add newTableArrayStarter(objName[1].strVals, field,
             child.children[1].inlineSize, child.children[1].fieldSize).stringify
       else:
          if typ notin BasicNimTypes:
             if typ in toSeq(unions.names):
-               result.add newTableUnionTypeAdder(objName[1].strVal, field, typ & "Type", slo).stringify
+               result.add newTableUnionTypeAdder(objName[1].strVals, field, typ & "Type", slo).stringify
                result.add "\n"
                # TODO: Consider creating a "type [UnionName] = uoffset" and use that instead of using "uoffset" directly
-               result.add newTableUnionAdder(objName[1].strVal, field, "uoffset", slo).stringify
+               result.add newTableUnionAdder(objName[1].strVals, field, "uoffset", slo).stringify
             elif typ in toSeq(enums.namesE):
-               result.add newTableEnumAdder(objName[1].strVal, field, getName(enums, typ).getEnumName(), slo).stringify
+               result.add newTableEnumAdder(objName[1].strVals, field, getName(enums, typ).getEnumName(), slo).stringify
             else:
-               result.add newTableAdder(objName[1].strVal, field, "uoffset", slo).stringify
+               result.add newTableAdder(objName[1].strVals, field, "uoffset", slo).stringify
          else:
             if typ == "string":
-               result.add newTableStringAdder(objName[1].strVal, field, "uoffset", slo).stringify
+               result.add newTableStringAdder(objName[1].strVals, field, "uoffset", slo).stringify
             else:
-               result.add newTableAdder(objName[1].strVal, field, typ, slo).stringify
+               result.add newTableAdder(objName[1].strVals, field, typ, slo).stringify
    result.add newEnder(node).stringify
    result.add "\n\n"
 
@@ -978,15 +977,14 @@ proc newNodeFromFlat(node: Node): seq[string] =
       unions.add node
       result = newUnion(node)
    else:
-      quit("ERROR, not supported node type: " & $node.kind & "\n\n")
+      raise newException(Exception, "ERROR, not supported node type: " & $node.kind & "\n\n")
 
-macro generateCodeImpl*(path, filename, outputDir: static[string]; abs: static[bool]): untyped =
-   let
-      path = splitFile(path).dir
-      resourcepath = path / filename
-
+proc generateCodeImpl*(
+      resourcepath: string,
+      outputfile: string,
+) =
    var
-      file = staticRead(resourcepath)
+      file = readFile(resourcepath)
       lexer: Lexer
       parser: Parser
 
@@ -996,31 +994,20 @@ macro generateCodeImpl*(path, filename, outputDir: static[string]; abs: static[b
    parser.initParser(lexer.tokens)
    parser.parse()
 
-   var header = "import\n  Nimflatbuffers\n\n\n"
+   var header = "import Nimflatbuffers\n\n"
 
    var
-      outputFile: string = "output"
       fileContents: string = header
       allNodes: seq[string]
       currentNode: seq[string]
 
    for node in parser.nodes:
       if node.kind == tkNamespace:
-         outputFile = node.lexeme.replace(".", "_") & ".nim"
-      else:
-         currentNode = newNodeFromFlat(node)
-         allNodes.add currentNode
-         for str in currentNode:
-            fileContents.add(str)
+         continue
+      currentNode = newNodeFromFlat(node)
+      allNodes.add currentNode
+      for str in currentNode:
+         fileContents.add(str)
 
 
-
-   var err: int
-   err = gorgeEx(currentSourcePath() / "../../utils/createDir " & path & "\\" & outputDir).exitCode
-   if err != 0:
-      quit("ERROR: " & $err & ". COULD NOT CREATE DIRECTORY: " & outputDir &
-           " at " & path)
-
-   writeFile(path & "\\" & outputDir & "\\" & outputFile, fileContents[0..^3])
-
-   result = parseExpr("import " & path & "\\" & outputDir & "\\" & outputFile[0..^5])
+   writeFile(outputFile, fileContents[0..^3])

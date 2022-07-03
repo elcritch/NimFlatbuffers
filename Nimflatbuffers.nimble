@@ -4,8 +4,15 @@ description = "A pure nim flatbuffers implementation + .fbs processor macro"
 license     = "MIT"
 
 srcDir = "src"
+binDir = "bin/"
+namedBin = {"Nimflatbuffers/flatn/flatn": "flatn"}.toTable()
+installExt = @["nim"]
+
 
 requires "nim >= 1.4.0"
+requires "compiler >= 1.4.0"
+requires "cdecl#head"
+requires "cligen >= 1.5.2"
 
 task MonsterTest, "Runs the Monster test":
    exec "nim c -r tests/monster/Monster"
