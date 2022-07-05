@@ -1,6 +1,4 @@
-import
-  Nimflatbuffers
-
+import Nimflatbuffers
 
 type
   Vector3* = object of FlatObj
@@ -34,91 +32,55 @@ type
 
 
 proc throttle*(this: ControllerState): float32 =
-  var o = this.tab.Offset(4)
-  if o != 0:
-    result = Get[float32](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 4, float32)
 
 proc `throttle=`*(this: var ControllerState; n: float32) =
   discard this.tab.MutateSlot(4, n)
 
 proc steer*(this: ControllerState): float32 =
-  var o = this.tab.Offset(6)
-  if o != 0:
-    result = Get[float32](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 6, float32)
 
 proc `steer=`*(this: var ControllerState; n: float32) =
   discard this.tab.MutateSlot(6, n)
 
 proc pitch*(this: ControllerState): float32 =
-  var o = this.tab.Offset(8)
-  if o != 0:
-    result = Get[float32](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 8, float32)
 
 proc `pitch=`*(this: var ControllerState; n: float32) =
   discard this.tab.MutateSlot(8, n)
 
 proc yaw*(this: ControllerState): float32 =
-  var o = this.tab.Offset(10)
-  if o != 0:
-    result = Get[float32](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 10, float32)
 
 proc `yaw=`*(this: var ControllerState; n: float32) =
   discard this.tab.MutateSlot(10, n)
 
 proc roll*(this: ControllerState): float32 =
-  var o = this.tab.Offset(12)
-  if o != 0:
-    result = Get[float32](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 12, float32)
 
 proc `roll=`*(this: var ControllerState; n: float32) =
   discard this.tab.MutateSlot(12, n)
 
 proc jump*(this: ControllerState): bool =
-  var o = this.tab.Offset(14)
-  if o != 0:
-    result = Get[bool](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 14, bool)
 
 proc `jump=`*(this: var ControllerState; n: bool) =
   discard this.tab.MutateSlot(14, n)
 
 proc boost*(this: ControllerState): bool =
-  var o = this.tab.Offset(16)
-  if o != 0:
-    result = Get[bool](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 16, bool)
 
 proc `boost=`*(this: var ControllerState; n: bool) =
   discard this.tab.MutateSlot(16, n)
 
 proc handbrake*(this: ControllerState): bool =
-  var o = this.tab.Offset(18)
-  if o != 0:
-    result = Get[bool](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 18, bool)
 
 proc `handbrake=`*(this: var ControllerState; n: bool) =
   discard this.tab.MutateSlot(18, n)
 
 proc useItem*(this: ControllerState): bool =
-  var o = this.tab.Offset(20)
-  if o != 0:
-    result = Get[bool](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 20, bool)
 
 proc `useItem=`*(this: var ControllerState; n: bool) =
   discard this.tab.MutateSlot(20, n)
@@ -162,11 +124,7 @@ type
 
 
 proc playerIndex*(this: PlayerInput): int32 =
-  var o = this.tab.Offset(4)
-  if o != 0:
-    result = Get[int32](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 4, int32)
 
 proc `playerIndex=`*(this: var PlayerInput; n: int32) =
   discard this.tab.MutateSlot(4, n)

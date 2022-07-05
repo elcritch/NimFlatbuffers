@@ -341,12 +341,15 @@ proc newTableGetter(obj, field, typA: string, off: int): NimNode =
          )
       ],
       parseStmt(
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   " & "   result = this.tab.Get[:" & typ & "](o + this.tab.Pos)\n" &
-         "else:\n" &
-         "   " & "   result = default(type(result))\n"
+         "basicTableGetter(this, " & $off & ", " & $typ & ")"
       )
+      # parseStmt(
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   " & "   result = this.tab.Get[:" & typ & "](o + this.tab.Pos)\n" &
+      #    "else:\n" &
+      #    "   " & "   result = default(type(result))\n"
+      # )
    )
 
 # Struct getter
@@ -476,15 +479,16 @@ proc newTableArrayGetter(obj, field, typ: string; off, inlineSize, size: int): N
             newEmptyNode()
          )
       ],
-      parseStmt(
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   var x = this.tab.Vector(o)\n" &
-         "   x += j.uoffset * " & $inlineSize & ".uoffset\n" &
-         "   result = this.tab.Get[:" & typ & "](o + this.tab.Pos)\n" &
-         "else:\n" &
-         "   discard\n"
-      )
+      parseStmt("result = tableArrayGetter(this, " & $inlineSize & ")")
+      # parseStmt(
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   var x = this.tab.Vector(o)\n" &
+      #    "   x += j.uoffset * " & $inlineSize & ".uoffset\n" &
+      #    "   result = this.tab.Get[:" & typ & "](o + this.tab.Pos)\n" &
+      #    "else:\n" &
+      #    "   discard\n"
+      # )
    )
 
 proc newTableArrayLength(obj, field, typ: string, off: int): NimNode =

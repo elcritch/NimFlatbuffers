@@ -52,21 +52,13 @@ proc pos*(this: Monster): Vec3 =
     result = default(type(result))
 
 proc mana*(this: Monster): int16 =
-  var o = this.tab.Offset(6)
-  if o != 0:
-    result = Get[int16](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 6, int16)
 
 proc `mana=`*(this: var Monster; n: int16) =
   discard this.tab.MutateSlot(6, n)
 
 proc hp*(this: Monster): int16 =
-  var o = this.tab.Offset(8)
-  if o != 0:
-    result = Get[int16](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 8, int16)
 
 proc `hp=`*(this: var Monster; n: int16) =
   discard this.tab.MutateSlot(8, n)
@@ -78,11 +70,7 @@ proc name*(this: Monster): string =
     discard
 
 proc friendly*(this: Monster): bool =
-  var o = this.tab.Offset(12)
-  if o != 0:
-    result = Get[bool](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 12, bool)
 
 proc `friendly=`*(this: var Monster; n: bool) =
   discard this.tab.MutateSlot(12, n)
@@ -120,11 +108,7 @@ proc name*(this: Weapon): string =
     discard
 
 proc damage*(this: Weapon): int16 =
-  var o = this.tab.Offset(6)
-  if o != 0:
-    result = Get[int16](this.tab, o + this.tab.Pos)
-  else:
-    result = default(type(result))
+  basicTableGetter(this, 6, int16)
 
 proc `damage=`*(this: var Weapon; n: int16) =
   discard this.tab.MutateSlot(6, n)

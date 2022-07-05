@@ -1,7 +1,7 @@
 import Nimflatbuffers
 
-generateCode("MonsterSchema.fbs")
-#import output/MyGame_Sample
+# generateCode("MonsterSchema.fbs")
+import output/MyGame_Sample
 
 var builder = newBuilder(1024)
 #[
