@@ -170,7 +170,7 @@ proc writeVtable*(this): uoffset =
          vt2End = vt2Start + vt2Len.int
          vt2 = this.bytes[this.bytes.len - vt2Offset.int + metadata..<vt2End]
 
-      if VtableEqual(this.current_vtable, objectOffset, vt2):
+      if vtableEqual(this.current_vtable, objectOffset, vt2):
          existingVtable = vt2Offset
          break
 
@@ -208,7 +208,7 @@ proc endObject*(this): uoffset =
    result = this.writeVtable()
    this.nested = false
 
-proc end*(this: var Builder): uoffset =
+proc ends*(this: var Builder): uoffset =
    result = this.endObject()
 
 proc startVector*(this; elemSize: int, numElems: int, alignment: int): uoffset =
