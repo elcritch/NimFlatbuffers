@@ -340,9 +340,7 @@ proc newTableGetter(obj, field, typA: string, off: int): NimNode =
             newEmptyNode()
          )
       ],
-      parseStmt(
-         "basicTableGetter(this, " & $off & ", " & $typ & ")"
-      )
+      parseStmt( "basicTableGetter(this, " & $off & ", " & $typ & ")")
       # parseStmt(
       #    "var o = this.tab.Offset(" & $off & ")\n" &
       #    "if o != 0:\n" &
@@ -367,15 +365,16 @@ proc newTableGetterS(obj, field, typ: string; off: int): NimNode =
             newEmptyNode()
          ),
       ],
-      parseStmt(
-         #"var obj: " & typ & "\n" &
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   " & "   var x = o + this.tab.Pos\n" &
-         "   " & "   result.Init(this.tab.Bytes, x)\n" &
-         "else:\n" &
-         "   " & "   result = default(type(result))\n"
-      )
+      parseStmt( "basicTableGetterS(this, " & $off & ", " & $typ & ")")
+      # parseStmt(
+      #    #"var obj: " & typ & "\n" &
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   " & "   var x = o + this.tab.Pos\n" &
+      #    "   " & "   result.Init(this.tab.Bytes, x)\n" &
+      #    "else:\n" &
+      #    "   " & "   result = default(type(result))\n"
+      # )
    )
 
 # Table getter
@@ -393,15 +392,16 @@ proc newTableGetterT(obj, field, typ: string; off: int): NimNode =
             newEmptyNode()
          ),
       ],
-      parseStmt(
-         #"var obj: " & typ & "\n" &
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   " & "   var x = this.tab.Indirect(o + this.tab.Pos)\n" &
-         "   " & "   result.Init(this.tab.Bytes, x)\n" &
-         "else:\n" &
-         "   " & "   result = default(type(result))\n"
-      )
+      parseStmt( "basicTableGetterT(this, " & $off & ", " & $typ & ")")
+      # parseStmt(
+      #    #"var obj: " & typ & "\n" &
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   " & "   var x = this.tab.Indirect(o + this.tab.Pos)\n" &
+      #    "   " & "   result.Init(this.tab.Bytes, x)\n" &
+      #    "else:\n" &
+      #    "   " & "   result = default(type(result))\n"
+      # )
    )
 
 proc newTableSetter(obj, field, typA: string, off: int): NimNode =
@@ -451,13 +451,14 @@ proc newTableStringGetter(obj, field, typ: string; off: int): NimNode =
             newEmptyNode()
          )
       ],
-      parseStmt(
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   result = this.tab.toString(o)\n" &
-         "else:\n" &
-         "   discard\n"
-      )
+      parseStmt( "basicTableStringGetter(this, " & $off & ", " & $typ & ")")
+      # parseStmt(
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   result = this.tab.toString(o)\n" &
+      #    "else:\n" &
+      #    "   discard\n"
+      # )
    )
 
 proc newTableArrayGetter(obj, field, typ: string; off, inlineSize, size: int): NimNode =

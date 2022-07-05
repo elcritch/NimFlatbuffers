@@ -44,12 +44,7 @@ type
 
 
 proc pos*(this: Monster): Vec3 =
-  var o = this.tab.Offset(4)
-  if o != 0:
-    var x = this.tab.Indirect(o + this.tab.Pos)
-    result.Init(this.tab.Bytes, x)
-  else:
-    result = default(type(result))
+  basicTableGetterT(this, 4, Vec3)
 
 proc mana*(this: Monster): int16 =
   basicTableGetter(this, 6, int16)
@@ -63,11 +58,7 @@ proc hp*(this: Monster): int16 =
 proc `hp=`*(this: var Monster; n: int16) =
   discard this.tab.MutateSlot(8, n)
 proc name*(this: Monster): string =
-  var o = this.tab.Offset(10)
-  if o != 0:
-    result = this.tab.toString(o)
-  else:
-    discard
+  basicTableStringGetter(this, 10, string)
 
 proc friendly*(this: Monster): bool =
   basicTableGetter(this, 12, bool)
@@ -101,11 +92,7 @@ type
   Weapon* = object of FlatObj
 
 proc name*(this: Weapon): string =
-  var o = this.tab.Offset(4)
-  if o != 0:
-    result = this.tab.toString(o)
-  else:
-    discard
+  basicTableStringGetter(this, 4, string)
 
 proc damage*(this: Weapon): int16 =
   basicTableGetter(this, 6, int16)
