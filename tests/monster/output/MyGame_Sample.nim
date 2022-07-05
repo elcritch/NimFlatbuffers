@@ -43,45 +43,45 @@ type
   Monster* = object of FlatObj
 
 
-proc pos*(this: Monster): Vec3 =
+proc pos*(this: monster): Vec3 =
   basicTableGetterT(this, 4, Vec3)
 
-proc mana*(this: Monster): int16 =
+proc mana*(this: monster): int16 =
   basicTableGetter(this, 6, int16)
 
-proc `mana=`*(this: var Monster; n: int16) =
+proc `mana=`*(this: var monster; n: int16) =
   discard this.tab.mutateSlot(6, n)
 
-proc hp*(this: Monster): int16 =
+proc hp*(this: monster): int16 =
   basicTableGetter(this, 8, int16)
 
-proc `hp=`*(this: var Monster; n: int16) =
+proc `hp=`*(this: var monster; n: int16) =
   discard this.tab.mutateSlot(8, n)
-proc name*(this: Monster): string =
+proc name*(this: monster): string =
   basicTableStringGetter(this, 10, string)
 
-proc friendly*(this: Monster): bool =
+proc friendly*(this: monster): bool =
   basicTableGetter(this, 12, bool)
 
-proc `friendly=`*(this: var Monster; n: bool) =
+proc `friendly=`*(this: var monster; n: bool) =
   discard this.tab.mutateSlot(12, n)
 
 proc MonsterStart*(this: var Builder) =
   this.startObject(5)
 
-proc MonsterAddPos*(this: var Builder; pos: uoffset) =
+proc monsterAddPos*(this: var Builder; pos: uoffset) =
   this.prependSlot(0, pos, default(uoffset))
 
-proc MonsterAddMana*(this: var Builder; mana: uoffset) =
+proc monsterAddMana*(this: var Builder; mana: uoffset) =
   this.prependSlot(1, mana, default(uoffset))
 
-proc MonsterAddHp*(this: var Builder; hp: uoffset) =
+proc monsterAddHp*(this: var Builder; hp: uoffset) =
   this.prependSlot(2, hp, default(uoffset))
 
-proc MonsterAddName*(this: var Builder; name: uoffset) =
+proc monsterAddName*(this: var Builder; name: uoffset) =
   this.prependSlot(4, name, default(uoffset))
 
-proc MonsterAddFriendly*(this: var Builder; friendly: uoffset) =
+proc monsterAddFriendly*(this: var Builder; friendly: uoffset) =
   this.prependSlot(4, friendly, default(uoffset))
 
 proc MonsterEnd*(this: var Builder): uoffset =
@@ -91,22 +91,22 @@ proc MonsterEnd*(this: var Builder): uoffset =
 type
   Weapon* = object of FlatObj
 
-proc name*(this: Weapon): string =
+proc name*(this: weapon): string =
   basicTableStringGetter(this, 4, string)
 
-proc damage*(this: Weapon): int16 =
+proc damage*(this: weapon): int16 =
   basicTableGetter(this, 6, int16)
 
-proc `damage=`*(this: var Weapon; n: int16) =
+proc `damage=`*(this: var weapon; n: int16) =
   discard this.tab.mutateSlot(6, n)
 
 proc WeaponStart*(this: var Builder) =
   this.startObject(2)
 
-proc WeaponAddName*(this: var Builder; name: uoffset) =
+proc weaponAddName*(this: var Builder; name: uoffset) =
   this.prependSlot(1, name, default(uoffset))
 
-proc WeaponAddDamage*(this: var Builder; damage: int16) =
+proc weaponAddDamage*(this: var Builder; damage: int16) =
   this.prependSlot(1, damage, default(int16))
 
 proc WeaponEnd*(this: var Builder): uoffset =

@@ -822,7 +822,7 @@ proc newTableStarter(node: Node): NimNode =
    result = newProc(
       nnkPostFix.newTree(
          ident "*",
-         ident FirstLetterCap(node.children[0].lexeme) & "Start"
+         ident node.children[0].lexeme & "Start"
       ),
       [
          newEmptyNode(),
@@ -841,9 +841,12 @@ proc newTableStarter(node: Node): NimNode =
 
 proc newTable(node: Node): seq[string] =
    var
-      objName = nnkPostfix.newTree(ident"*", ident(node.children[0].lexeme))
+      objName = node.children[0].lexeme.SnakeCase()
+      objId = nnkPostfix.newTree(ident"*", ident(node.children[0].lexeme))
       mutatorProcs: seq[string]
 
+   echo "OBJ_NAME: ", repr(objname)
+   echo "OBJ_NAME:1: ", repr(objname[1])
    var
       objType = nnkObjectTy.newTree(
          newEmptyNode(),
@@ -857,14 +860,14 @@ proc newTable(node: Node): seq[string] =
       if child.children[1].kind == nkOpenArray:
          if typ notin BasicNimTypes:
             mutatorProcs.add "\n"
-            mutatorProcs.add newTableArrayGetter(objName[1].strVals, field, "uoffset", off, child.children[1].inlineSize, size).stringify
+            mutatorProcs.add newTableArrayGetter(objName, field, "uoffset", off, child.children[1].inlineSize, size).stringify
             mutatorProcs.add "\n"
-            mutatorProcs.add newTableArrayLength(objName[1].strVals, field, "uoffset", off).stringify
+            mutatorProcs.add newTableArrayLength(objName, field, "uoffset", off).stringify
          else:
             mutatorProcs.add "\n"
-            mutatorProcs.add newTableArrayGetter(objName[1].strVals, field, typ, off, child.children[1].inlineSize, size).stringify
+            mutatorProcs.add newTableArrayGetter(objName, field, typ, off, child.children[1].inlineSize, size).stringify
             mutatorProcs.add "\n"
-            mutatorProcs.add newTableArrayLength(objName[1].strVals, field, typ, off).stringify
+            mutatorProcs.add newTableArrayLength(objName, field, typ, off).stringify
       else:
          var hasDefault: bool = false
          if "|" in typ: # only support default values for basic types, so we dont need to check for non basic types
@@ -875,40 +878,40 @@ proc newTable(node: Node): seq[string] =
          if typ notin BasicNimTypes and not hasDefault:
             if typ in toSeq(unions.names):
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableUnionTypeGetter(objName[1].strVals, field, typ & "Type", off).stringify
+               mutatorProcs.add newTableUnionTypeGetter(objName, field, typ & "Type", off).stringify
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableUnionTypeSetter(objName[1].strVals, field, typ & "Type", off).stringify
+               mutatorProcs.add newTableUnionTypeSetter(objName, field, typ & "Type", off).stringify
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableUnionGetter(objName[1].strVals, field, "uoffset", off).stringify
+               mutatorProcs.add newTableUnionGetter(objName, field, "uoffset", off).stringify
                #mutatorProcs.add "\n"
                #mutatorProcs.add newTableUnionSetter(objName[1].strVals, field, getName(enums, typ).enumType, slo).stringify
             elif typ in toSeq(enums.namesE):
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableGetter(objName[1].strVals, field, getName(enums, typ).enumType, off).stringify
+               mutatorProcs.add newTableGetter(objName, field, getName(enums, typ).enumType, off).stringify
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableSetter(objName[1].strVals, field, getName(enums, typ).enumType, off).stringify
+               mutatorProcs.add newTableSetter(objName, field, getName(enums, typ).enumType, off).stringify
             elif typ in toSeq(structs.names):
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableGetterS(objName[1].strVals, field, typ, off).stringify
+               mutatorProcs.add newTableGetterS(objName, field, typ, off).stringify
                # TODO: make this only added when --gen-mutable is passed (and also allow for --gen-mutable to be passed :p )
                #mutatorProcs.add "\n"
                #mutatorProcs.add newTableSetter(objName[1].strVals, field, typ, off).stringify
             else:
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableGetterT(objName[1].strVals, field, typ, off).stringify
+               mutatorProcs.add newTableGetterT(objName, field, typ, off).stringify
                # TODO: make this only added when --gen-mutable is passed (and also allow for --gen-mutable to be passed :p )
                #mutatorProcs.add "\n"
                #mutatorProcs.add newTableSetter(objName[1].strVals, field, typ, off).stringify
          else:
             if typ == "string":
-               mutatorProcs.add newTableStringGetter(objName[1].strVals, field, typ, off).stringify
+               mutatorProcs.add newTableStringGetter(objName, field, typ, off).stringify
             else:
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableGetter(objName[1].strVals, field, typ, off).stringify
+               mutatorProcs.add newTableGetter(objName, field, typ, off).stringify
                mutatorProcs.add "\n"
-               mutatorProcs.add newTableSetter(objName[1].strVals, field, typ, off).stringify
+               mutatorProcs.add newTableSetter(objName, field, typ, off).stringify
 
-   result.add nnkTypeSection.newTree(nnkTypeDef.newTree(objName, newEmptyNode(), objType)).stringify
+   result.add nnkTypeSection.newTree(nnkTypeDef.newTree(objId, newEmptyNode(), objType)).stringify
    result.add "\n\n"
    result.add mutatorProcs
    result.add "\n"
@@ -916,26 +919,26 @@ proc newTable(node: Node): seq[string] =
    for field, typ, off, slo, size, child in node.fieldTypeSlots:
       result.add "\n"
       if child.children[1].kind == nkOpenArray:
-         result.add newTableArrayAdder(objName[1].strVals, field, "uoffset", slo).stringify
+         result.add newTableArrayAdder(objName, field, "uoffset", slo).stringify
          result.add "\n"
-         result.add newTableArrayStarter(objName[1].strVals, field,
+         result.add newTableArrayStarter(objName, field,
             child.children[1].inlineSize, child.children[1].fieldSize).stringify
       else:
          if typ notin BasicNimTypes:
             if typ in toSeq(unions.names):
-               result.add newTableUnionTypeAdder(objName[1].strVals, field, typ & "Type", slo).stringify
+               result.add newTableUnionTypeAdder(objName, field, typ & "Type", slo).stringify
                result.add "\n"
                # TODO: Consider creating a "type [UnionName] = uoffset" and use that instead of using "uoffset" directly
-               result.add newTableUnionAdder(objName[1].strVals, field, "uoffset", slo).stringify
+               result.add newTableUnionAdder(objName, field, "uoffset", slo).stringify
             elif typ in toSeq(enums.namesE):
-               result.add newTableEnumAdder(objName[1].strVals, field, getName(enums, typ).getEnumName(), slo).stringify
+               result.add newTableEnumAdder(objName, field, getName(enums, typ).getEnumName(), slo).stringify
             else:
-               result.add newTableAdder(objName[1].strVals, field, "uoffset", slo).stringify
+               result.add newTableAdder(objName, field, "uoffset", slo).stringify
          else:
             if typ == "string":
-               result.add newTableStringAdder(objName[1].strVals, field, "uoffset", slo).stringify
+               result.add newTableStringAdder(objName, field, "uoffset", slo).stringify
             else:
-               result.add newTableAdder(objName[1].strVals, field, typ, slo).stringify
+               result.add newTableAdder(objName, field, typ, slo).stringify
    result.add newEnder(node).stringify
    result.add "\n\n"
 

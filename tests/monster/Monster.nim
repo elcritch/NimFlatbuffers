@@ -1,11 +1,11 @@
-import Nimflatbuffers
-import nimflatbuffers/builder
+import Nimflatbuffers/runtime/flatbuffers
 
 # generateCode("MonsterSchema.fbs")
 import output/MyGame_Sample
 
 var mst: Monster
-var builder = Monster.newBuilder(1024)
+var builder: Builder[Monster]
+# var builder = Monster.newBuilder(1024)
 
 #[
 var

@@ -1,3 +1,5 @@
+import strutils
+
 proc `*`*(a: string, b: int): string =
    for i in 0..b:
       result.add a
@@ -12,3 +14,7 @@ proc FirstLetterCap*(s: string): string =
       result = $(chr(ord(s[0]) - (ord('a') - ord('A')))) & s[1..^1]
    else:
       result = s
+
+proc SnakeCase*(s: string): string =
+   result = s
+   result[0] = result[0].toLowerAscii()
