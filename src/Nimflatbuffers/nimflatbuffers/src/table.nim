@@ -153,8 +153,8 @@ proc mutate*[T](this; off: uoffset, n: T): bool =
    return true
 
 func mutateSlot*[T](this; slot: voffset, n: T): bool =
-   let off: voffset = this.Offset(slot)
+   let off: voffset = this.offset(slot)
    if off != 0:
-      discard this.Mutate(this.pos + off.uoffset, n)
+      discard this.mutate(this.pos + off.uoffset, n)
       return true
    return false

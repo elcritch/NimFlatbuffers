@@ -15,7 +15,6 @@ type
 type
   Vec3* = object of FlatObj
 
-
 proc x*(this: Vec3): float32 =
   structGetter(this, 0, float32)
 proc `x=`*(this: var Vec3; n: float32; ) =

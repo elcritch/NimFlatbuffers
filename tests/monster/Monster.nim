@@ -57,7 +57,7 @@ var finishedBytes = builder.FinishedBytes()
 # echo finishedBytes
 
 var aMonster: Monster
-GetRootAs(aMonster, finishedBytes, 0)
+getRootAs(aMonster, finishedBytes, 0)
 
 echo "Monster HP: ", aMonster.hp
 echo "Monster Name: \"", aMonster.name, "\""
