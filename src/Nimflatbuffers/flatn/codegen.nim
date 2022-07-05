@@ -170,7 +170,7 @@ proc stringify(n: NimNode): string =
 
 proc newEnder(node: Node): NimNode {.used.} =
    result = parseStmt("proc " & node.children[0].lexeme & "End*(this: var Builder): uoffset =\n" &
-   "   result = this.EndObject()\n")
+   "   result = this.endObject()\n")
 
 proc newStructGetter(obj, field, typ: string, off: int): NimNode =
    result = newProc(
@@ -262,7 +262,7 @@ proc newStructCreator(node: Node): NimNode {.used.} =
    ]
 
    for child in node.children[1].children.reversed():
-      toPrepend.add "this.Prepend(" & child.children[0].lexeme & ")"
+      toPrepend.add "this.prepend(" & child.children[0].lexeme & ")"
       toPrepend.add "\n"
       inputs.add nnkIdentDefs.newTree(
          ident child.children[0].lexeme,
@@ -279,9 +279,9 @@ proc newStructCreator(node: Node): NimNode {.used.} =
       ),
       args,
       parseStmt(
-         "this.Prep(" & $node.alignment & ", " & $node.structSize & ")\n" &
+         "this.prep(" & $node.alignment & ", " & $node.structSize & ")\n" &
          toPrepend &
-         "result = this.Offset()"
+         "result = this.offset()"
 
       )
    )
@@ -538,7 +538,7 @@ proc newTableArrayStarter(obj, field: string; inlineSize, fieldSize: int): NimNo
          )
       ],
       parseStmt(
-         "this.StartVector(" & $fieldSize & ", numElems, " & $inlineSize & ")\n"
+         "this.startVector(" & $fieldSize & ", numElems, " & $inlineSize & ")\n"
       )
    )
 
@@ -684,7 +684,7 @@ proc newTableAdder(obj, field, typ: string, slo: int): NimNode =
          )
       ],
       parseStmt(
-         "this.PrependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
+         "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
 
@@ -710,7 +710,7 @@ proc newTableEnumAdder(obj, field, typ: string, slo: int): NimNode =
          )
       ],
       parseStmt(
-         "this.PrependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
+         "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
 
@@ -736,7 +736,7 @@ proc newTableArrayAdder(obj, field, typ: string, slo: int): NimNode =
          )
       ],
       parseStmt(
-         "this.PrependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
+         "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
 
@@ -762,7 +762,7 @@ proc newTableUnionTypeAdder(obj, field, typ: string, slo: int): NimNode =
          )
       ],
       parseStmt(
-         "this.PrependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
+         "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
 
@@ -788,7 +788,7 @@ proc newTableUnionAdder(obj, field, typ: string, slo: int): NimNode =
          )
       ],
       parseStmt(
-         "this.PrependSlot(" & $(slo + 1) & ", " & field & ", default(" & typ & "))\n"
+         "this.prependSlot(" & $(slo + 1) & ", " & field & ", default(" & typ & "))\n"
       )
    )
 
@@ -814,7 +814,7 @@ proc newTableStringAdder(obj, field, typ: string, slo: int): NimNode =
          )
       ],
       parseStmt(
-         "this.PrependSlot(" & $(slo + 1) & ", " & field & ", default(" & typ & "))\n"
+         "this.prependSlot(" & $(slo + 1) & ", " & field & ", default(" & typ & "))\n"
       )
    )
 
@@ -835,7 +835,7 @@ proc newTableStarter(node: Node): NimNode =
          ),
       ],
       parseStmt(
-         "this.StartObject(" & $node.children[1].children.len & ")\n"
+         "this.startObject(" & $node.children[1].children.len & ")\n"
       )
    )
 
