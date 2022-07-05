@@ -29,15 +29,15 @@ func getVal*[T](b: ptr seq[byte]): T {.inline.} =
       result = cast[ptr T](unsafeAddr b[][0])[]
 
 
-template get*[T](this; off: uoffset): T =
+template get*[T](this; off: uoffset, typ: typedesc[T]): T =
    var b = this.bytes[off..^1]
    getVal[T](addr b)
 
-template get*[T](this; off: soffset): T =
+template get*[T](this; off: soffset, typ: typedesc[T]): T =
    var b = this.bytes[off..^1]
    getVal[T](addr b)
 
-template get*[T](this; off: voffset): T =
+template get*[T](this; off: voffset, typ: typedesc[T]): T =
    var b = this.bytes[off..^1]
    getVal[T](addr b)
 
@@ -91,9 +91,9 @@ func writeVal*[T: SomeFloat](b: var seq[byte], n: T) {.inline.} =
 
 func offset*(this; off: voffset): voffset =
    let vtable: voffset = (this.pos - this.getOffsetAt(this.pos)).voffset
-   let vtableEnd: voffset = this.get[:voffset](vtable)
+   let vtableEnd: voffset = this.getTableAt(vtable)
    if off < vtableEnd:
-      return this.get[:voffset](vtable + off)
+      return this.getTableAt(vtable + off)
    return 0
 
 

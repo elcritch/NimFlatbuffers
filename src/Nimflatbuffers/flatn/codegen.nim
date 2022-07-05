@@ -186,9 +186,10 @@ proc newStructGetter(obj, field, typ: string, off: int): NimNode =
             newEmptyNode()
          )
       ],
-      parseStmt(  # TODO understand why the offset is wrong by -4, hardcoded solution should be provisional
-         "result = this.tab.Get[:" & typ & "](this.tab.Pos + " & $(off + 4) & ")\n"
-      )
+      parseStmt( "structGetter(this, " & $off & ", " & $typ & ")")
+      # parseStmt(  # TODO understand why the offset is wrong by -4, hardcoded solution should be provisional
+      #    "result = this.tab.Get[:" & typ & "](this.tab.Pos + " & $(off + 4) & ")\n"
+      # )
    )
 
 proc newStructGetterT(obj, field, typ: string, off: int): NimNode =
