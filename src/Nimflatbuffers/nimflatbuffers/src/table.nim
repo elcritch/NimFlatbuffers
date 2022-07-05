@@ -9,18 +9,18 @@ type
 type Offsets* = uoffset | soffset | voffset
 
 type Vtable* = object
-   Bytes*: seq[byte]
-   Pos*: uoffset
+   bytes*: seq[byte]
+   pos*: uoffset
 
 
 using this: Vtable
 
 
-func GetVal*[T](b: ptr seq[byte]): T {.inline.} =
+func getVal*[T](b: ptr seq[byte]): T {.inline.} =
    when T is float64:
-      result = cast[T](GetVal[uint64](b))
+      result = cast[T](getVal[uint64](b))
    elif T is float32:
-      result = cast[T](GetVal[uint32](b))
+      result = cast[T](getVal[uint32](b))
    elif T is string:
       result = cast[T](b[])
    else:
@@ -29,19 +29,27 @@ func GetVal*[T](b: ptr seq[byte]): T {.inline.} =
       result = cast[ptr T](unsafeAddr b[][0])[]
 
 
-template Get*[T](this; off: uoffset): T =
-   var seq = this.Bytes[off..^1]
-   GetVal[T](addr seq)
+template get*[T](this; off: uoffset): T =
+   var b = this.bytes[off..^1]
+   getVal[T](addr b)
 
-template Get*[T](this; off: soffset): T =
-   var seq = this.Bytes[off..^1]
-   GetVal[T](addr seq)
+template get*[T](this; off: soffset): T =
+   var b = this.bytes[off..^1]
+   getVal[T](addr b)
 
-template Get*[T](this; off: voffset): T =
-   var seq = this.Bytes[off..^1]
-   GetVal[T](addr seq)
+template get*[T](this; off: voffset): T =
+   var b = this.bytes[off..^1]
+   getVal[T](addr b)
 
-func WriteVal*[T: not SomeFloat](b: var openArray[byte], n: T) {.inline.} =
+template getOffsetAt*(this; off: uoffset): uoffset =
+   var seq = this.bytes[off..^1]
+   getVal[uoffset](addr seq)
+
+template getTableAt*(this; off: voffset): voffset =
+   var seq = this.bytes[off..^1]
+   getVal[voffset](addr seq)
+
+func writeVal*[T: not SomeFloat](b: var openArray[byte], n: T) {.inline.} =
    when sizeof(T) == 8:
       littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
    elif sizeof(T) == 4:
@@ -55,7 +63,7 @@ func WriteVal*[T: not SomeFloat](b: var openArray[byte], n: T) {.inline.} =
       #littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
       #{.error:"shouldnt appear".}
 
-func WriteVal*[T: not SomeFloat](b: var seq[byte], n: T) {.inline.} =
+func writeVal*[T: not SomeFloat](b: var seq[byte], n: T) {.inline.} =
    when sizeof(T) == 8:
       littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
    elif sizeof(T) == 4:
@@ -69,84 +77,84 @@ func WriteVal*[T: not SomeFloat](b: var seq[byte], n: T) {.inline.} =
       #littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
       #{.error:"shouldnt appear".}
 
-func WriteVal*[T: SomeFloat](b: var openArray[byte], n: T) {.inline.} =
+func writeVal*[T: SomeFloat](b: var openArray[byte], n: T) {.inline.} =
    when T is float64:
-      WriteVal(b, cast[uint64](n))
+      writeVal(b, cast[uint64](n))
    elif T is float32:
-      WriteVal(b, cast[uint32](n))
+      writeVal(b, cast[uint32](n))
 
-func WriteVal*[T: SomeFloat](b: var seq[byte], n: T) {.inline.} =
+func writeVal*[T: SomeFloat](b: var seq[byte], n: T) {.inline.} =
    when T is float64:
-      WriteVal(b, cast[uint64](n))
+      writeVal(b, cast[uint64](n))
    elif T is float32:
-      WriteVal(b, cast[uint32](n))
+      writeVal(b, cast[uint32](n))
 
-func Offset*(this; off: voffset): voffset =
-   let vtable: voffset = (this.Pos - this.Get[:uoffset](this.Pos)).voffset
-   let vtableEnd: voffset = this.Get[:voffset](vtable)
+func offset*(this; off: voffset): voffset =
+   let vtable: voffset = (this.pos - this.getOffsetAt(this.pos)).voffset
+   let vtableEnd: voffset = this.get[:voffset](vtable)
    if off < vtableEnd:
-      return this.Get[:voffset](vtable + off)
+      return this.get[:voffset](vtable + off)
    return 0
 
 
-func Indirect*(this; off: uoffset): uoffset =
-   debugEcho this.Bytes[off..^1]
-   result = off + this.Get[:uoffset](off)
+func indirect*(this; off: uoffset): uoffset =
+   debugEcho this.bytes[off..^1]
+   result = off + this.getOffsetAt(off)
 
-func VectorLen*(this; off: uoffset): int =
-   var newoff: uoffset = off + this.Pos
-   newoff += this.Get[:uoffset](off)
-   return this.Get[:uoffset](newoff).int
+func vectorLen*(this; off: uoffset): int =
+   var newoff: uoffset = off + this.pos
+   newoff += this.getOffsetAt(off)
+   return this.getOffsetAt(newoff).int
 
-func Vector*(this; off: uoffset): uoffset =
-   let newoff: uoffset = off + this.Get[:uoffset](off)
-   var x = newoff + this.Get[:uoffset](off)
+func vector*(this; off: uoffset): uoffset =
+   let newoff: uoffset = off + this.getOffsetAt(off)
+   var x = newoff + this.getOffsetAt(off)
    x += (uoffset.sizeof).uoffset
    result = x
 
-func Union*(this; t2: var Vtable, off: uoffset) =
-   let newoff: uoffset = off + this.Get[:uoffset](off)
-   t2.Pos = newoff + this.Get[:uoffset](off)
-   t2.Bytes = this.Bytes
+func union*(this; t2: var Vtable, off: uoffset) =
+   let newoff: uoffset = off + this.getOffsetAt(off)
+   t2.pos = newoff + this.getOffsetAt(off)
+   t2.bytes = this.bytes
 
-func GetSlot*[T](this; slot: voffset, d: T): T =
+func getSlot*[T](this; slot: voffset, d: T): T =
    let off = this.Offset(slot)
    if off == 0:
       return d
-   return this.Get[T](this.Pos + off)
+   return this.Get[T](this.pos + off)
 
-func GetOffsetSlot*[T: Offsets](this; slot: voffset, d: T): T =
+func getOffsetSlot*[T: Offsets](this; slot: voffset, d: T): T =
    let off = this.Offset(slot)
    if off == 0:
       return d
    return off
 
-func ByteVector*(this; off: uoffset): seq[byte] =
+func byteVector*(this; off: uoffset): seq[byte] =
    let
-      newoff: uoffset = off + this.Get[:uoffset](off)
+      newoff: uoffset = off + this.getOffsetAt(off)
       start = newoff + (uoffset.sizeof).uoffset
-   var newseq = this.Bytes[newoff..^1]
+   var newseq = this.bytes[newoff..^1]
    debugEcho newseq
    let
-      length = GetVal[uoffset](addr newseq)
+      length = getVal[uoffset](addr newseq)
    debugEcho length
-   result = this.Bytes[start..start+length]
+   result = this.bytes[start..start+length]
 
 func toString*(this; off: uoffset): string =
-   var seq = this.ByteVector(off)
-   result = GetVal[string](addr seq)
+   var seq = this.byteVector(off)
+   result = getVal[string](addr seq)
 
 using this: var Vtable
 
-proc Mutate*[T](this; off: uoffset, n: T): bool =
-   var seq = this.Bytes[off.int..^1]
-   WriteVal(seq, n)
-   this.Bytes = seq
+proc mutate*[T](this; off: uoffset, n: T): bool =
+   var seq = this.bytes[off.int..^1]
+   writeVal(seq, n)
+   this.bytes = seq
    return true
 
-func MutateSlot*[T](this; slot: voffset, n: T): bool =
+func mutateSlot*[T](this; slot: voffset, n: T): bool =
    let off: voffset = this.Offset(slot)
    if off != 0:
-      discard this.Mutate(this.Pos + off.uoffset, n)
+      discard this.Mutate(this.pos + off.uoffset, n)
       return true
    return false
