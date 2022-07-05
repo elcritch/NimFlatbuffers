@@ -1,4 +1,5 @@
 import Nimflatbuffers
+import nimflatbuffers/builder
 
 # generateCode("MonsterSchema.fbs")
 import output/MyGame_Sample
