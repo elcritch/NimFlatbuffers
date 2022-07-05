@@ -5,7 +5,7 @@ import table
 const MAX_BUFFER_SIZE* = 2^31
 
 
-type Builder* = ref object of RootObj
+type Builder*[V] = ref object of RootObj
    bytes*: seq[byte]
    minalign*: int
    current_vtable*: seq[uoffset]
@@ -78,7 +78,7 @@ proc growByteBuffer*(this) =
 
    this.bytes = secondHalf
 
-proc place*[T](this; x: T) =
+proc place*[V](this; x: V) =
    this.head -= uoffset x.sizeof
    writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), x)
 
@@ -98,34 +98,34 @@ proc prep*(this; size: int, additionalBytes: int) =
       this.head += (this.bytes.len - oldbufSize).uoffset
    this.pad(alignsize)
 
-proc prependOffsetRelative*[T: Offsets](this; off: T) =
-   when T is voffset:
-      this.prep(T.sizeof, 0)
+proc prependOffsetRelative*[V: Offsets](this; off: V) =
+   when V is voffset:
+      this.prep(V.sizeof, 0)
       if not off.uoffset <= this.offset:
             quit("flatbuffers: Offset arithmetic error.")
       this.place(off)
    else:
-      this.prep(T.sizeof, 0)
+      this.prep(V.sizeof, 0)
       if not off.uoffset <= this.offset:
          quit("flatbuffers: Offset arithmetic error.")
-      let off2: T = this.offset.T - off + sizeof(T).T
+      let off2: V = this.offset.V - off + sizeof(V).V
       this.place(off2)
 
 
-proc prepend*[T](this; x: T) =
+proc prepend*[V](this; x: V) =
    this.prep(x.sizeof, 0)
    this.place(x)
 
 proc slot*(this; slotnum: int) =
    this.current_vtable[slotnum] = this.offset
 
-proc prependSlot*[T](this; o: int, x, d: T) =
+proc prependSlot*[V](this; o: int, x, d: V) =
    if x != d:
       this.prepend(x)
       this.slot(o)
 
-proc add*[T](this; n: T) =
-   this.prep(T.sizeof, 0)
+proc add*[V](this; n: V) =
+   this.prep(V.sizeof, 0)
    writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), n)
 
 proc vtableEqual*(a: seq[uoffset], objectStart: uoffset, b: seq[byte]): bool =
@@ -234,7 +234,7 @@ proc getBytes*(str: string | cstring): seq[byte] =
    for chr in str:
       result.add byte chr
 
-proc create*[T](this; s: T): uoffset = #Both CreateString and CreateByteVector functionality
+proc create*[V](this; s: V): uoffset = #Both CreateString and CreateByteVector functionality
    if this.nested:
       quit("builder is nested")
    this.nested = true
@@ -245,7 +245,7 @@ proc create*[T](this; s: T): uoffset = #Both CreateString and CreateByteVector f
    let l = s.len.uoffset
 
    this.head -= l
-   when T is cstring or T is string:
+   when V is cstring or V is string:
       this.bytes[this.head.int..this.head.int + 1] = s.getBytes()
    else:
       this.bytes[this.head.int..this.head.int + 1] = s
