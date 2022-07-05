@@ -508,11 +508,12 @@ proc newTableArrayLength(obj, field, typ: string, off: int): NimNode =
             newEmptyNode()
          )
       ],
-      parseStmt(
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   result = this.tab.Vectorlen(o)\n"
-      )
+      parseStmt( "tableArrayLength(this, " & $off & ", " & $typ & ")")
+      # parseStmt(
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   result = this.tab.Vectorlen(o)\n"
+      # )
    )
 
 proc newTableArrayStarter(obj, field: string; inlineSize, fieldSize: int): NimNode =
@@ -555,13 +556,14 @@ proc newTableUnionTypeGetter(obj, field, typ: string, off: int): NimNode =
             newEmptyNode()
          )
       ],
-      parseStmt(
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   result = this.tab.Get[:" & typ & "](o + this.tab.Pos)\n" &
-         "else:\n" &
-         "   result = default(type(result))\n"
-      )
+      parseStmt( "tableUnionTypeGetter(this, " & $off & ", " & $typ & ")")
+      # parseStmt(
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   result = this.tab.Get[:" & typ & "](o + this.tab.Pos)\n" &
+      #    "else:\n" &
+      #    "   result = default(type(result))\n"
+      # )
    )
 
 proc newTableUnionTypeSetter(obj, field, typ: string, off: int): NimNode =
@@ -611,16 +613,17 @@ proc newTableUnionGetter(obj, field, typ: string; off: int): NimNode =
             newEmptyNode()
          )]#
       ],
-      parseStmt(
-         #"var obj: " & typ & "\n" &
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   this.tab.Union(result.tab, o)\n" &
-         #"   " & "   result = true\n" &
-         "else:\n" &
-         "   discard"
-         #"   " & "   result = false\n"
-      )
+      parseStmt( "tableUnionGetter(this, " & $off & ", " & $typ & ")")
+      # parseStmt(
+      #    #"var obj: " & typ & "\n" &
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   this.tab.Union(result.tab, o)\n" &
+      #    #"   " & "   result = true\n" &
+      #    "else:\n" &
+      #    "   discard"
+      #    #"   " & "   result = false\n"
+      # )
    )
 # NO SETTERS IN THE API!!!
 proc newTableUnionSetter(obj, field, typ: string; off: int): NimNode =
@@ -646,16 +649,17 @@ proc newTableUnionSetter(obj, field, typ: string; off: int): NimNode =
             newEmptyNode()
          ),
       ],
-      parseStmt(
-         #"var obj: " & typ & "\n" &
-         "var o = this.tab.Offset(" & $off & ")\n" &
-         "if o != 0:\n" &
-         "   this.tab.Union(obj.tab, o)\n" &
-         #"   " & "   result = true\n" &
-         "else:\n" &
-         "   discard"
-         #"   " & "   result = false\n"
-      )
+      parseStmt( "tableUnionGetter(this, " & $off & ", n)")
+      # parseStmt(
+      #    #"var obj: " & typ & "\n" &
+      #    "var o = this.tab.Offset(" & $off & ")\n" &
+      #    "if o != 0:\n" &
+      #    "   this.tab.Union(obj.tab, o)\n" &
+      #    #"   " & "   result = true\n" &
+      #    "else:\n" &
+      #    "   discard"
+      #    #"   " & "   result = false\n"
+      # )
    )
 
 proc newTableAdder(obj, field, typ: string, slo: int): NimNode =
