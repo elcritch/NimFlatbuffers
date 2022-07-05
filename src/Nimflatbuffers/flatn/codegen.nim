@@ -1009,5 +1009,6 @@ proc generateCodeImpl*(
       for str in currentNode:
          fileContents.add(str)
 
-
+   if not dirExists(outputfile.parentDir()):
+      createDir(outputfile.parentDir())
    writeFile(outputFile, fileContents[0..^3])

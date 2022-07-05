@@ -18,7 +18,7 @@ proc generate(
     let
       resourcePath = filename.absolutePath()
       modName = parseModuleName(resourcePath)
-      outputFileName = outputDir / modName
+      outputFileName = resourcePath.parentDir() / outputDir / modName
     echo fmt"flatbuffer namespace: {modName=}"
     echo fmt"flatbuffer namespace: {outputFileName=}"
 
