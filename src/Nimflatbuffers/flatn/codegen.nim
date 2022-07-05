@@ -235,9 +235,10 @@ proc newStructSetter(obj, field, typ: string, off: int): NimNode =
          ),
          newEmptyNode()
       ],
-      parseStmt(  # TODO understand why the offset is wrong by -4, hardcoded solution should be provisional
-         "discard this.tab.Mutate(this.tab.Pos + " & $(off + 4) & ", n)"
-      )
+      parseStmt( "structSetter(this, " & $off & ", n)")
+      # parseStmt(  # TODO understand why the offset is wrong by -4, hardcoded solution should be provisional
+      #    "discard this.tab.Mutate(this.tab.Pos + " & $(off + 4) & ", n)"
+      # )
    )
 
 proc newStructCreator(node: Node): NimNode {.used.} =
@@ -434,7 +435,7 @@ proc newTableSetter(obj, field, typA: string, off: int): NimNode =
          )
       ],
       parseStmt(
-         "discard this.tab.MutateSlot(" & $off & ", n)\n"
+         "discard this.tab.mutateSlot(" & $off & ", n)\n"
       )
    )
 

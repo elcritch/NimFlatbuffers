@@ -42,6 +42,9 @@ proc basicTableStringGetter*[F: FlatObj, V](this: F, offset: voffset, typ: typed
 proc structGetter*[F: FlatObj, V](this: F, offset: voffset, typ: typedesc[V]): V =
   result = this.tab.get(this.tab.pos + off + 4, typ)
 
+proc structSetter*[F, V](this: F, offset: voffset, n: V) =
+  discard this.tab.mutate(this.tab.pos + 4, n)
+
 proc tableArrayGetter*[F: FlatObj, V](this: F, inlineSize: int): V =
   let j: int
   var o = this.tab.offset($off)
