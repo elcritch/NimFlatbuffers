@@ -1,6 +1,6 @@
 import strutils
 
-import ../nimflatbuffers/nimflatbuffers
+import ../runtime/flatbuffers
 
 import codegen
 import parser/Parser
