@@ -80,7 +80,7 @@ proc GrowByteBuffer*(this) =
 
 proc Place*[T](this; x: T) =
    this.head -= uoffset x.sizeof
-   WriteVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), x)
+   writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), x)
 
 func Pad*(this; n: int) =
    for i in 0..<n:
@@ -126,7 +126,7 @@ proc PrependSlot*[T](this; o: int, x, d: T) =
 
 proc Add*[T](this; n: T) =
    this.Prep(T.sizeof, 0)
-   WriteVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), n)
+   writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), n)
 
 proc VtableEqual*(a: seq[uoffset], objectStart: uoffset, b: seq[byte]): bool =
    if a.len * voffset.sizeof != b.len:
@@ -135,7 +135,7 @@ proc VtableEqual*(a: seq[uoffset], objectStart: uoffset, b: seq[byte]): bool =
    var i = 0
    while i < a.len:
       var seq = b[i * voffset.sizeof..<(i + 1) * voffset.sizeof]
-      let x = GetVal[voffset](addr seq)
+      let x = getVal[voffset](addr seq)
 
       if x == 0 and a[i] == 0:
          inc i
@@ -165,7 +165,7 @@ proc WriteVtable*(this): uoffset =
 
       var seq = this.bytes[vt2Start..<this.bytes.len]
       let
-         vt2Len = GetVal[voffset](addr seq)
+         vt2Len = getVal[voffset](addr seq)
          metadata = 2 * voffset.sizeof # VtableMetadataFields * SizeVOffsetT
          vt2End = vt2Start + vt2Len.int
          vt2 = this.bytes[this.bytes.len - vt2Offset.int + metadata..<vt2End]
@@ -189,14 +189,14 @@ proc WriteVtable*(this): uoffset =
       this.PrependOffsetRelative(vBytes.voffset)
 
       let objectStart = (this.bytes.len.soffset - objectOffset.soffset)
-      WriteVal(this.bytes.toOpenArray(objectStart.int, this.bytes.len - 1), (this.Offset - objectOffset).soffset)
+      writeVal(this.bytes.toOpenArray(objectStart.int, this.bytes.len - 1), (this.Offset - objectOffset).soffset)
 
       this.vtables.add this.Offset
    else:
       let objectStart = this.bytes.len.soffset - objectOffset.soffset
       this.head = uoffset objectStart
 
-      WriteVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1),
+      writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1),
          (existingVtable - objectOffset).soffset)
 
       this.current_vtable = @[]
@@ -228,7 +228,7 @@ proc EndVector*(this; vectorNumElems: int): uoffset =
 
 proc getChars*(str: seq[byte]): string =
    var bytes = str
-   result = GetVal[string](addr bytes)
+   result = getVal[string](addr bytes)
 
 proc getBytes*(str: string | cstring): seq[byte] =
    for chr in str:
