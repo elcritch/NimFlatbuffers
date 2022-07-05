@@ -15,10 +15,8 @@ type Builder*[V] = ref object of RootObj
    nested*: bool
    finished*: bool
 
-using this: var Builder
-
-func newBuilder*[T](typ: typedesc[T], size: int): Builder[T] =
-   result = new Builder[T]()
+proc newBuilder*[T](typ: typedesc[T], size: int): Builder[T] =
+   result = new(Builder[T])
    result.bytes.setLen(size)
    result.minalign = 1
    result.head = size.uoffset
@@ -98,7 +96,7 @@ proc prep*[T, V](this: var Builder[T]; size: int, additionalBytes: int) =
       this.head += (this.bytes.len - oldbufSize).uoffset
    this.pad(alignsize)
 
-proc prependOffsetRelative*[V: Offsets](this; off: V) =
+proc prependOffsetRelative*[T, V: Offsets](this: var Builder[T]; off: V) =
    when V is voffset:
       this.prep(V.sizeof, 0)
       if not off.uoffset <= this.offset:

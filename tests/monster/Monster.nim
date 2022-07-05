@@ -3,7 +3,9 @@ import Nimflatbuffers
 # generateCode("MonsterSchema.fbs")
 import output/MyGame_Sample
 
-var builder = newBuilder(1024)
+var mst: Monster
+var builder = Monster.newBuilder(1024)
+
 #[
 var
    weaponOne = builder.Create("Sword")

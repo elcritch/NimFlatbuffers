@@ -4,4 +4,4 @@ import
     struct,
     table
   ]
-export nimflatbuffers.builder, nimflatbuffers.table, nimflatbuffers.struct
+export builder, table, struct
