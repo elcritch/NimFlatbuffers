@@ -17,11 +17,11 @@ func getUnion*[T: FlatObj](this: var Vtable; off: uoffset): T =
 func `getRootAs`*(result: var FlatObj; buf: seq[byte]; offset: uoffset) =
    var
       vtable = Vtable(bytes: buf[offset..^1], pos: offset)
-      n = get[uoffset](vtable, offset)
+      n = vtable.getOffsetAt(offset)
    result.init(buf, n+offset)
 
 func `getRootAs`*(result: var FlatObj; buf: string; offset: uoffset) =
    var
       vtable = Vtable(bytes: cast[seq[byte]](buf)[offset..^1], pos: offset)
-      n = get[uoffset](vtable, offset)
+      n = vtable.getOffsetAt(offset)
    result.init(cast[seq[byte]](buf), n+offset)

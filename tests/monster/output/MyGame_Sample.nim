@@ -17,17 +17,17 @@ type
 
 
 proc x*(this: Vec3): float32 =
-  result = Get[float32](this.tab, this.tab.Pos + 4)
+  structGetter(this, 0, float32)
 proc `x=`*(this: var Vec3; n: float32; ) =
   discard this.tab.Mutate(this.tab.Pos + 4, n)
 
 proc y*(this: Vec3): float32 =
-  result = Get[float32](this.tab, this.tab.Pos + 8)
+  structGetter(this, 4, float32)
 proc `y=`*(this: var Vec3; n: float32; ) =
   discard this.tab.Mutate(this.tab.Pos + 8, n)
 
 proc z*(this: Vec3): float32 =
-  result = Get[float32](this.tab, this.tab.Pos + 12)
+  structGetter(this, 8, float32)
 proc `z=`*(this: var Vec3; n: float32; ) =
   discard this.tab.Mutate(this.tab.Pos + 12, n)
 
