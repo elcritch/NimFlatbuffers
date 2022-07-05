@@ -4,24 +4,24 @@ import table
 type FlatObj* {.inheritable.} = object
    tab*: Vtable
 
-func Table*(this: var FlatObj): Vtable = this.tab
+func table*(this: var FlatObj): Vtable = this.tab
 
-func Init*(this: var FlatObj; buf: seq[byte]; i: uoffset) =
-   this.tab.Bytes = buf
-   this.tab.Pos = i
+func init*(this: var FlatObj; buf: seq[byte]; i: uoffset) =
+   this.tab.bytes = buf
+   this.tab.pos = i
 
 # Cant define it in table.nim since it needs FlatObj and Init
-func GetUnion*[T: FlatObj](this: var Vtable; off: uoffset): T =
-   result.Init(this.Bytes, this.Indirect(off))
+func getUnion*[T: FlatObj](this: var Vtable; off: uoffset): T =
+   result.init(this.bytes, this.indirect(off))
 
-func `GetRootAs`*(result: var FlatObj; buf: seq[byte]; offset: uoffset) =
+func `getRootAs`*(result: var FlatObj; buf: seq[byte]; offset: uoffset) =
    var
-      vtable = Vtable(Bytes: buf[offset..^1], Pos: offset)
-      n = Get[uoffset](vtable, offset)
-   result.Init(buf, n+offset)
+      vtable = Vtable(bytes: buf[offset..^1], pos: offset)
+      n = get[uoffset](vtable, offset)
+   result.init(buf, n+offset)
 
-func `GetRootAs`*(result: var FlatObj; buf: string; offset: uoffset) =
+func `getRootAs`*(result: var FlatObj; buf: string; offset: uoffset) =
    var
-      vtable = Vtable(Bytes: cast[seq[byte]](buf)[offset..^1], Pos: offset)
-      n = Get[uoffset](vtable, offset)
-   result.Init(cast[seq[byte]](buf), n+offset)
+      vtable = Vtable(bytes: cast[seq[byte]](buf)[offset..^1], pos: offset)
+      n = get[uoffset](vtable, offset)
+   result.init(cast[seq[byte]](buf), n+offset)
