@@ -78,7 +78,7 @@ proc growByteBuffer*[T](this: Builder[T]) =
 
 proc place*[T, V](this: var Builder[T]; x: V) =
    this.head -= uoffset x.sizeof
-   writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), x)
+   writeVal(this.bytes, this.head.int, x)
 
 func pad*[T](this: var Builder[T]; n: int) =
    for i in 0..<n:
@@ -187,15 +187,16 @@ proc writeVtable*[T](this: var Builder[T]): uoffset =
       this.prependOffsetRelative(vBytes.voffset)
 
       let objectStart = (this.bytes.len.soffset - objectOffset.soffset)
-      writeVal(this.bytes.toOpenArray(objectStart.int, this.bytes.len - 1), (this.offset - objectOffset).soffset)
+      let val = (this.offset - objectOffset).soffset
+      writeVal(this.bytes, objectStart.int, val)
 
       this.vtables.add this.offset
    else:
       let objectStart = this.bytes.len.soffset - objectOffset.soffset
       this.head = uoffset objectStart
 
-      writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1),
-         (existingVtable - objectOffset).soffset)
+      let val = (existingVtable - objectOffset).soffset
+      writeVal(this.bytes, this.head.int, val)
 
       this.current_vtable = @[]
    result = objectOffset
@@ -236,7 +237,7 @@ proc create*[T, V](this: var Builder[T]; s: V): uoffset = #Both CreateString and
       quit("builder is nested")
    this.nested = true
 
-   this.prep(uoffset.sizeof, s.len + 1 * byte.sizeof)
+   this.prep(uoffset.sizeof, s.len + 1)
    this.place(0.byte)
 
    let l = s.len.uoffset

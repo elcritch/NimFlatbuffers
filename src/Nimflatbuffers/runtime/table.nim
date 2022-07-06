@@ -1,5 +1,4 @@
-import endian
-
+import std/endians
 
 type
    uoffset* = uint32                ## offset in to the buffer
@@ -40,45 +39,17 @@ proc getOffsetAt*(this: VTable; off: uoffset): uoffset =
 proc getTableAt*(this: VTable; off: voffset): voffset =
    result = this.get(off, voffset)
 
-proc writeVal*[T: not SomeFloat](b: var openArray[byte], n: T) {.inline.} =
+proc writeVal*[T](b: var openArray[byte], index: int, n: T) {.inline.} =
    when sizeof(T) == 8:
-      littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
+      littleEndian64(addr b[index], unsafeAddr n)
    elif sizeof(T) == 4:
-      littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
+      littleEndian32(addr b[index], unsafeAddr n)
    elif sizeof(T) == 2:
-      littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
+      littleEndian16(addr b[index], unsafeAddr n)
    elif sizeof(T) == 1:
       b[0] = n.uint8
    else:
-      discard
-      #littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
-      #{.error:"shouldnt appear".}
-
-proc writeVal*[T: not SomeFloat](b: var seq[byte], n: T) {.inline.} =
-   when sizeof(T) == 8:
-      littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
-   elif sizeof(T) == 4:
-      littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
-   elif sizeof(T) == 2:
-      littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
-   elif sizeof(T) == 1:
-      b[0] = n.uint8
-   else:
-      discard
-      #littleEndianX(addr b[0], unsafeAddr n, T.sizeof)
-      #{.error:"shouldnt appear".}
-
-proc writeVal*[T: SomeFloat](b: var openArray[byte], n: T) {.inline.} =
-   when T is float64:
-      writeVal(b, cast[uint64](n))
-   elif T is float32:
-      writeVal(b, cast[uint32](n))
-
-proc writeVal*[T: SomeFloat](b: var seq[byte], n: T) {.inline.} =
-   when T is float64:
-      writeVal(b, cast[uint64](n))
-   elif T is float32:
-      writeVal(b, cast[uint32](n))
+      {.error: "write of invalid size: " & sizeof(T).}
 
 proc offset*(this; off: voffset): voffset =
    let vtable: voffset = (this.pos - this.getOffsetAt(this.pos)).voffset
@@ -135,9 +106,7 @@ proc toString*(this; off: uoffset): string =
 using this: var Vtable
 
 proc mutate*[T](this; off: uoffset, n: T): bool =
-   var seq = this.bytes[off.int..^1]
-   writeVal(seq, n)
-   this.bytes = seq
+   writeVal(this.bytes, off.int, n)
    return true
 
 proc mutateSlot*[T](this; slot: voffset, n: T): bool =
