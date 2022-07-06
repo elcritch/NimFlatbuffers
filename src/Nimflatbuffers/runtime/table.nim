@@ -15,43 +15,30 @@ type Vtable* = object
 
 using this: Vtable
 
-
-proc getVal*[T](b: ptr seq[byte]): T =
-   echo "BYTES:getVal: ", repr(b)
-   when T is float64:
-      result = cast[T](getVal[uint64](b))
-   elif T is float32:
-      result = cast[T](getVal[uint32](b))
-   elif T is string:
-      result = cast[T](b[])
-   else:
-      if b[].len < T.sizeof:
-         b[].setLen T.sizeof
-      result = cast[ptr T](unsafeAddr b[][0])[]
-
+proc getVal*[T](bytes: seq[byte], offset: int, typ: typedesc[T]): T =
+   assert off.int + sizeof(T) < bytes.len()
+   copyMem(result.addr, bytes[offset].unsafeAddr, sizeof(T))
 
 proc get*[T](this: VTable; off: uoffset, typ: typedesc[T]): T =
    echo "GET:uoffset: ", repr(off), " bytes: ", repr(this.bytes)
-   var b = this.bytes[off..^1]
-   getVal[T](addr b)
+   assert off.int + sizeof(T) < this.bytes.len()
+   copyMem(result.addr, this.bytes[off].unsafeAddr, sizeof(T))
 
 proc get*[T](this: VTable; off: soffset, typ: typedesc[T]): T =
    echo "GET:soffset: ", repr(off), " bytes: ", repr(this.bytes)
-   var b = this.bytes[off..^1]
-   getVal[T](addr b)
+   assert off.int + sizeof(T) < this.bytes.len()
+   copyMem(result.addr, this.bytes[off].unsafeAddr, sizeof(T))
 
 proc get*[T](this: VTable; off: voffset, typ: typedesc[T]): T =
    echo "GET:voffset: ", repr(off), " bytes: ", repr(this.bytes)
-   var b = this.bytes[off..^1]
-   getVal[T](addr b)
+   assert off.int + sizeof(T) < this.bytes.len()
+   copyMem(result.addr, this.bytes[off].unsafeAddr, sizeof(T))
 
 proc getOffsetAt*(this: VTable; off: uoffset): uoffset =
-   var seq = this.bytes[off..^1]
-   getVal[uoffset](addr seq)
+   result = this.get(off, uoffset)
 
 proc getTableAt*(this: VTable; off: voffset): voffset =
-   var seq = this.bytes[off..^1]
-   getVal[voffset](addr seq)
+   result = this.get(off, voffset)
 
 proc writeVal*[T: not SomeFloat](b: var openArray[byte], n: T) {.inline.} =
    when sizeof(T) == 8:
@@ -137,16 +124,13 @@ proc byteVector*(this; off: uoffset): seq[byte] =
    let
       newoff: uoffset = off + this.getOffsetAt(off)
       start = newoff + (uoffset.sizeof).uoffset
-   var newseq = this.bytes[newoff..^1]
-   debugEcho newseq
-   let
-      length = getVal[uoffset](addr newseq)
+      length = this.get(newoff, uoffset)
    debugEcho length
    result = this.bytes[start..start+length]
 
 proc toString*(this; off: uoffset): string =
-   var seq = this.byteVector(off)
-   result = getVal[string](addr seq)
+   var str = this.byteVector(off)
+   result = $str
 
 using this: var Vtable
 

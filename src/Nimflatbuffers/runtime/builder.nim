@@ -132,8 +132,8 @@ proc vtableEqual*(a: seq[uoffset], objectStart: uoffset, b: seq[byte]): bool =
 
    var i = 0
    while i < a.len:
-      var seq = b[i * voffset.sizeof..<(i + 1) * voffset.sizeof]
-      let x = getVal[voffset](addr seq)
+      let off = i * voffset.sizeof
+      let x = b.getVal(off, voffset)
 
       if x == 0 and a[i] == 0:
          inc i
@@ -161,9 +161,9 @@ proc writeVtable*[T](this: var Builder[T]): uoffset =
          vt2Offset: uoffset = this.vtables[i]
          vt2Start: int = this.bytes.len - int vt2Offset
 
-      var seq = this.bytes[vt2Start..<this.bytes.len]
+      var buff = this.bytes[vt2Start..<this.bytes.len]
       let
-         vt2Len = getVal[voffset](addr seq)
+         vt2Len = getVal(buff, vt2Start, voffset)
          metadata = 2 * voffset.sizeof # VtableMetadataFields * SizeVOffsetT
          vt2End = vt2Start + vt2Len.int
          vt2 = this.bytes[this.bytes.len - vt2Offset.int + metadata..<vt2End]
@@ -225,8 +225,7 @@ proc endVector*[T](this: var Builder[T]; vectorNumElems: int): uoffset =
    result = this.offset
 
 proc getChars*(str: seq[byte]): string =
-   var bytes = str
-   result = getVal[string](addr bytes)
+   result = $str
 
 proc getBytes*(str: string | cstring): seq[byte] =
    for chr in str:
