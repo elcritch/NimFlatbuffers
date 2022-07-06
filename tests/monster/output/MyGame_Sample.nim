@@ -69,20 +69,20 @@ proc `friendly=`*(this: var Monster; n: bool) =
 proc monsterStart*[B](this: var B) =
   this.startObject(5)
 
-# proc monsterAddPos*[B](this: var B; pos: uoffset) =
-#   this.prependSlot(0, pos, default(uoffset))
+proc monsterAddPos*[B](this: var B; pos: uoffset) =
+  this.prependSlot(0, pos, default(uoffset))
 
-# proc monsterAddMana*[B](this: var B; mana: uoffset) =
-#   this.prependSlot(1, mana, default(uoffset))
+proc monsterAddMana*[B](this: var B; mana: uoffset) =
+  this.prependSlot(1, mana, default(uoffset))
 
-# proc monsterAddHp*[B](this: var B; hp: uoffset) =
-#   this.prependSlot(2, hp, default(uoffset))
+proc monsterAddHp*[B](this: var B; hp: uoffset) =
+  this.prependSlot(2, hp, default(uoffset))
 
-# proc monsterAddName*[B](this: var B; name: uoffset) =
-#   this.prependSlot(4, name, default(uoffset))
+proc monsterAddName*[B](this: var B; name: uoffset) =
+  this.prependSlot(4, name, default(uoffset))
 
-# proc monsterAddFriendly*[B](this: var B; friendly: uoffset) =
-#   this.prependSlot(4, friendly, default(uoffset))
+proc monsterAddFriendly*[B](this: var B; friendly: uoffset) =
+  this.prependSlot(4, friendly, default(uoffset))
 
 proc monsterEnd*[T](this: var Builder[T]): uoffset =
   result = this.endObject()
