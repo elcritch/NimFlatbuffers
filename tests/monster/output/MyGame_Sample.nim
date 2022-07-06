@@ -31,7 +31,7 @@ proc z*(this: Vec3): float32 =
 proc `z=`*(this: var Vec3; n: float32; ) =
   structSetter(this, 8, n)
 
-proc createVec3*(this: var B; x: float32; y: float32; z: float32): uoffset =
+proc createVec3*[B: Builder](this: var B; x: float32; y: float32; z: float32): uoffset =
   this.prep(4, 12)
   this.prepend(z)
   this.prepend(y)

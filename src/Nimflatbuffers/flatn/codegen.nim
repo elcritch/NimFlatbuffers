@@ -285,6 +285,7 @@ proc newStructCreator(node: Node): NimNode {.used.} =
 
       )
    )
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
 
 proc newStruct(node: Node): seq[string] =
    var
