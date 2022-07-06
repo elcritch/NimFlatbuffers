@@ -31,16 +31,17 @@ proc getVal*[T](b: ptr seq[byte]): T =
 
 
 proc get*[T](this: VTable; off: uoffset, typ: typedesc[T]): T =
-   echo "GET: ", repr(off)
-   echo "BYTES: ", repr(this.bytes)
+   echo "GET:uoffset: ", repr(off), " bytes: ", repr(this.bytes)
    var b = this.bytes[off..^1]
    getVal[T](addr b)
 
 proc get*[T](this: VTable; off: soffset, typ: typedesc[T]): T =
+   echo "GET:soffset: ", repr(off), " bytes: ", repr(this.bytes)
    var b = this.bytes[off..^1]
    getVal[T](addr b)
 
 proc get*[T](this: VTable; off: voffset, typ: typedesc[T]): T =
+   echo "GET:voffset: ", repr(off), " bytes: ", repr(this.bytes)
    var b = this.bytes[off..^1]
    getVal[T](addr b)
 
