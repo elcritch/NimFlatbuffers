@@ -3,9 +3,12 @@ import Nimflatbuffers/runtime/flatbuffers
 # generateCode("MonsterSchema.fbs")
 import output/MyGame_Sample
 
-var mst: Monster
-var builder: Builder[Monster]
-# var builder = Monster.newBuilder(1024)
+static:
+   echo "tp: monster: ", typeof(Monster)
+
+# var builder: Builder[Monster]
+# var builder = newBuilders[Monsters](1024)
+var builder = Monster.newBuilder(1024)
 
 #[
 var
@@ -39,11 +42,12 @@ discard builder.CreateVec3(4.0, 5.0, 6.0)
 path = builder.EndVector(2)
 ]#
 var name = builder.create("Orc")
-builder.monsterStart()
-builder.monsterAddPos(builder.CreateVec3(1.0, 2.0, 3.0))
-builder.monsterAddHp(301)
-builder.monsterAddMana(10)
-builder.monsterAddName(name)
+builder.monstersStart()
+# builder.monsterAddPos(builder.CreateVec3(1.0, 2.0, 3.0))
+# builder.monsterAddHp(301)
+# builder.monsterAddMana(10)
+# builder.monsterAddName(name)
+
 #[
 builder.MonsterAddInventory(inv)
 builder.MonsterAddColor(Color.Red)
@@ -52,14 +56,14 @@ builder.MonsterAddEquippedType(EquipmentType.Weapon)
 builder.MonsterAddEquipped(axe)
 builder.MonsterAddPath(path)
 ]#
-var orc = builder.monsterEnd()
+var orc = builder.monstersEnd()
 
 builder.finish(orc)
 
 var finishedBytes = builder.finishedBytes()
 # echo finishedBytes
 
-var aMonster: Monster
+var aMonster: Monsters
 getRootAs(aMonster, finishedBytes, 0)
 
 echo "Monster HP: ", aMonster.hp

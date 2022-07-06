@@ -169,7 +169,7 @@ proc stringify(n: NimNode): string =
    n.repr
 
 proc newEnder(objName: string, node: Node): NimNode {.used.} =
-   result = parseStmt("proc " & objName & "End*(this: var Builder): uoffset =\n" &
+   result = parseStmt("proc " & objName & "End*[T](this: var Builder[T]): uoffset =\n" &
    "   result = this.endObject()\n")
 
 proc newStructGetter(obj, field, typ: string, off: int): NimNode =
@@ -255,7 +255,7 @@ proc newStructCreator(node: Node): NimNode {.used.} =
       nnkIdentDefs.newTree(
          ident "this",
          nnkVarTy.newTree(
-            ident "Builder"
+            ident "B"
          ),
          newEmptyNode()
       )
@@ -275,7 +275,7 @@ proc newStructCreator(node: Node): NimNode {.used.} =
    result = newProc(
       nnkPostFix.newTree(
          ident "*",
-         ident "Create" & node.children[0].lexeme
+         ident "create" & node.children[0].lexeme
       ),
       args,
       parseStmt(
@@ -527,7 +527,7 @@ proc newTableArrayStarter(obj, field: string; inlineSize, fieldSize: int): NimNo
          nnkIdentDefs.newTree(
             ident "this",
             nnkVarTy.newTree(
-               ident "Builder"
+               ident "B"
             ),
             newEmptyNode()
          ),
@@ -541,6 +541,7 @@ proc newTableArrayStarter(obj, field: string; inlineSize, fieldSize: int): NimNo
          "this.startVector(" & $fieldSize & ", numElems, " & $inlineSize & ")\n"
       )
    )
+   result[2] = nnkGenericParams.newTree(nnkIdentDefs.newTree(ident "T"))
 
 proc newTableUnionTypeGetter(obj, field, typ: string, off: int): NimNode =
    result = newProc(
@@ -673,7 +674,7 @@ proc newTableAdder(obj, field, typ: string, slo: int): NimNode =
          nnkIdentDefs.newTree(
             ident "this",
             nnkVarTy.newTree(
-               ident "Builder"
+               ident "B"
             ),
             newEmptyNode()
          ),
@@ -687,6 +688,7 @@ proc newTableAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
 
 proc newTableEnumAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -699,7 +701,7 @@ proc newTableEnumAdder(obj, field, typ: string, slo: int): NimNode =
          nnkIdentDefs.newTree(
             ident "this",
             nnkVarTy.newTree(
-               ident "Builder"
+               ident "B"
             ),
             newEmptyNode()
          ),
@@ -713,6 +715,7 @@ proc newTableEnumAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
 
 proc newTableArrayAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -725,7 +728,7 @@ proc newTableArrayAdder(obj, field, typ: string, slo: int): NimNode =
          nnkIdentDefs.newTree(
             ident "this",
             nnkVarTy.newTree(
-               ident "Builder"
+               ident "B"
             ),
             newEmptyNode()
          ),
@@ -739,6 +742,7 @@ proc newTableArrayAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
 
 proc newTableUnionTypeAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -751,7 +755,7 @@ proc newTableUnionTypeAdder(obj, field, typ: string, slo: int): NimNode =
          nnkIdentDefs.newTree(
             ident "this",
             nnkVarTy.newTree(
-               ident "Builder"
+               ident "B"
             ),
             newEmptyNode()
          ),
@@ -765,6 +769,7 @@ proc newTableUnionTypeAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
 
 proc newTableUnionAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -777,7 +782,7 @@ proc newTableUnionAdder(obj, field, typ: string, slo: int): NimNode =
          nnkIdentDefs.newTree(
             ident "this",
             nnkVarTy.newTree(
-               ident "Builder"
+               ident "B"
             ),
             newEmptyNode()
          ),
@@ -791,6 +796,7 @@ proc newTableUnionAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $(slo + 1) & ", " & field & ", default(" & typ & "))\n"
       )
    )
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
 
 proc newTableStringAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -803,7 +809,7 @@ proc newTableStringAdder(obj, field, typ: string, slo: int): NimNode =
          nnkIdentDefs.newTree(
             ident "this",
             nnkVarTy.newTree(
-               ident "Builder"
+               ident "B"
             ),
             newEmptyNode()
          ),
@@ -817,6 +823,7 @@ proc newTableStringAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $(slo + 1) & ", " & field & ", default(" & typ & "))\n"
       )
    )
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
 
 proc newTableStarter(objName: string, node: Node): NimNode =
    result = newProc(
@@ -829,7 +836,7 @@ proc newTableStarter(objName: string, node: Node): NimNode =
          nnkIdentDefs.newTree(
             ident "this",
             nnkVarTy.newTree(
-               ident "Builder"
+               ident "B"
             ),
             newEmptyNode()
          ),
@@ -838,6 +845,7 @@ proc newTableStarter(objName: string, node: Node): NimNode =
          "this.startObject(" & $node.children[1].children.len & ")\n"
       )
    )
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
 
 proc newTable(node: Node): seq[string] =
    var
