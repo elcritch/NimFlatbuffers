@@ -78,9 +78,9 @@ proc growByteBuffer*[T](this: Builder[T]) =
 
 proc place*[T, V](this: var Builder[T]; x: V) =
    this.head -= uoffset x.sizeof
-   writeVal(this.bytes, this.head.int, x)
+   writeVal(this.bytes, this.head.uint, x)
 
-func pad*[T](this: var Builder[T]; n: int) =
+proc pad*[T](this: var Builder[T]; n: int) =
    for i in 0..<n:
       this.place(0.byte)
 
@@ -124,7 +124,7 @@ proc prependSlot*[T, V](this: var Builder[T]; o: int, x, d: V) =
 
 proc add*[T, V](this: var Builder[T]; n: V) =
    this.prep(V.sizeof, 0)
-   writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), n)
+   writeVal(this.bytes, this.head.int, n)
 
 proc vtableEqual*(a: seq[uoffset], objectStart: uoffset, b: seq[byte]): bool =
    if a.len * voffset.sizeof != b.len:
@@ -188,7 +188,7 @@ proc writeVtable*[T](this: var Builder[T]): uoffset =
 
       let objectStart = (this.bytes.len.soffset - objectOffset.soffset)
       let val = (this.offset - objectOffset).soffset
-      writeVal(this.bytes, objectStart.int, val)
+      writeVal(this.bytes, objectStart.uint, val)
 
       this.vtables.add this.offset
    else:
@@ -196,7 +196,7 @@ proc writeVtable*[T](this: var Builder[T]): uoffset =
       this.head = uoffset objectStart
 
       let val = (existingVtable - objectOffset).soffset
-      writeVal(this.bytes, this.head.int, val)
+      writeVal(this.bytes, this.head.uint, val)
 
       this.current_vtable = @[]
    result = objectOffset
