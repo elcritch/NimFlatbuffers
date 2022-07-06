@@ -8,7 +8,8 @@ static:
 
 # var builder: Builder[Monster]
 # var builder = newBuilders[Monsters](1024)
-var builder = Monster.newBuilder(1024)
+var builder: Builder[Monster]
+builder.init(1024)
 
 #[
 var
@@ -63,7 +64,7 @@ builder.finish(orc)
 var finishedBytes = builder.finishedBytes()
 # echo finishedBytes
 
-var aMonster: Monsters
+var aMonster: Monster
 getRootAs(aMonster, finishedBytes, 0)
 
 echo "Monster HP: ", aMonster.hp

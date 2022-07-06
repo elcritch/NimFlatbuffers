@@ -15,14 +15,14 @@ type Builder*[V] = ref object of RootObj
    nested*: bool
    finished*: bool
 
-proc newBuilder*[T](typ: typedesc[T], size: int): Builder[T] =
-   result = new(Builder[T])
-   result.bytes.setLen(size)
-   result.minalign = 1
-   result.head = size.uoffset
-   #result.vtables.setLen(16)# = newSeq[uoffset](16)
-   result.nested = false
-   result.finished = false
+proc init*[T](builder: var Builder[T], size: int) =
+   builder = new(Builder[T])
+   builder.bytes.setLen(size)
+   builder.minalign = 1
+   builder.head = size.uoffset
+   # builder.vtables.setLen(16)# = newSeq[uoffset](16)
+   builder.nested = false
+   builder.finished = false
 
 proc finishedBytes*[T](this: Builder[T]): seq[byte] =
    if not this.finished:
