@@ -14,13 +14,13 @@ func init*(this: var FlatObj; buf: seq[byte]; i: uoffset) =
 func getUnion*[T: FlatObj](this: var Vtable; off: uoffset): T =
    result.init(this.bytes, this.indirect(off))
 
-func `getRootAs`*(result: var FlatObj; buf: seq[byte]; offset: uoffset) =
+proc getRootAs*(result: var FlatObj; buf: seq[byte]; offset: uoffset) =
    var
       vtable = Vtable(bytes: buf[offset..^1], pos: offset)
       n = vtable.getOffsetAt(offset)
    result.init(buf, n+offset)
 
-func `getRootAs`*(result: var FlatObj; buf: string; offset: uoffset) =
+proc getRootAs*(result: var FlatObj; buf: string; offset: uoffset) =
    var
       vtable = Vtable(bytes: cast[seq[byte]](buf)[offset..^1], pos: offset)
       n = vtable.getOffsetAt(offset)
