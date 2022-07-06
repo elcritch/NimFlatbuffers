@@ -24,7 +24,7 @@ proc newBuilder*[T](typ: typedesc[T], size: int): Builder[T] =
    result.nested = false
    result.finished = false
 
-proc finishedBytes*[T, V](this: Builder[T]): seq[byte] =
+proc finishedBytes*[T](this: Builder[T]): seq[byte] =
    if not this.finished:
       quit("Builder not finished, Incorrect use of FinishedBytes(): must call 'Finish' first.")
    result = this.bytes[this.head..^1]
@@ -35,10 +35,10 @@ proc output*[T, V](this: Builder[T]): seq[byte] =
 
    result = this.bytes[this.head..^1]
 
-func offset*[T, V](this: Builder[T]): uoffset =
+func offset*[T](this: Builder[T]): uoffset =
    result = this.bytes.len.uoffset - this.head
 
-proc startObject*[T, V](this: var Builder[T]; numfields: int) =
+proc startObject*[T](this: var Builder[T]; numfields: int) =
    if this.nested:
       quit("builder is nested")
 
@@ -52,7 +52,7 @@ proc startObject*[T, V](this: var Builder[T]; numfields: int) =
    this.objectEnd = this.offset()
    this.nested = true
 
-proc growByteBuffer*[T, V](this: Builder[T]) =
+proc growByteBuffer*[T](this: Builder[T]) =
    if this.bytes.len == MAX_BUFFER_SIZE:
       quit("flatbuffers: cannot grow buffer beyond 2 gigabytes")
    var newLen = min(this.bytes.len * 2, MAX_BUFFER_SIZE)
@@ -80,11 +80,11 @@ proc place*[T, V](this: var Builder[T]; x: V) =
    this.head -= uoffset x.sizeof
    writeVal(this.bytes.toOpenArray(this.head.int, this.bytes.len - 1), x)
 
-func pad*[T, V](this: var Builder[T]; n: int) =
+func pad*[T](this: var Builder[T]; n: int) =
    for i in 0..<n:
       this.place(0.byte)
 
-proc prep*[T, V](this: var Builder[T]; size: int, additionalBytes: int) =
+proc prep*[T](this: var Builder[T]; size: int, additionalBytes: int) =
    if size > this.minalign:
       this.minalign = size
    var alignsize = (not this.bytes.len - this.head.int + additionalBytes) + 1
@@ -96,7 +96,7 @@ proc prep*[T, V](this: var Builder[T]; size: int, additionalBytes: int) =
       this.head += (this.bytes.len - oldbufSize).uoffset
    this.pad(alignsize)
 
-proc prependOffsetRelative*[T, V: Offsets](this: var Builder[T]; off: V) =
+proc prependOffsetRelative*[V: Offsets, T](this: var Builder[T]; off: V) =
    when V is voffset:
       this.prep(V.sizeof, 0)
       if not off.uoffset <= this.offset:
@@ -114,7 +114,7 @@ proc prepend*[T, V](this: var Builder[T]; x: V) =
    this.prep(x.sizeof, 0)
    this.place(x)
 
-proc slot*[T, V](this: var Builder[T]; slotnum: int) =
+proc slot*[T](this: var Builder[T]; slotnum: int) =
    this.current_vtable[slotnum] = this.offset
 
 proc prependSlot*[T, V](this: var Builder[T]; o: int, x, d: V) =
@@ -145,7 +145,7 @@ proc vtableEqual*(a: seq[uoffset], objectStart: uoffset, b: seq[byte]): bool =
       inc i
    return true
 
-proc writeVtable*[T, V](this: Builder[T]): uoffset =
+proc writeVtable*[T](this: var Builder[T]): uoffset =
    this.prependOffsetRelative(0.soffset)
 
    let objectOffset = this.offset
@@ -200,13 +200,13 @@ proc writeVtable*[T, V](this: Builder[T]): uoffset =
       this.current_vtable = @[]
    result = objectOffset
 
-proc endObject*[T, V](this: Builder[T]): uoffset =
+proc endObject*[T](this: var Builder[T]): uoffset =
    if not this.nested:
       quit("builder is not nested")
    result = this.writeVtable()
    this.nested = false
 
-proc ends*[T, V](this: var Builder[T]): uoffset =
+proc ends*[T](this: var Builder[T]): uoffset =
    result = this.endObject()
 
 proc startVector*[T, V](this: var Builder[T]; elemSize: int, numElems: int, alignment: int): uoffset =
@@ -217,7 +217,7 @@ proc startVector*[T, V](this: var Builder[T]; elemSize: int, numElems: int, alig
    this.prep(alignment, elemSize * numElems)
    result = this.offset
 
-proc endVector*[T, V](this: var Builder[T]; vectorNumElems: int): uoffset =
+proc endVector*[T](this: var Builder[T]; vectorNumElems: int): uoffset =
    if not this.nested:
       quit("builder is not nested")
    this.nested = false
@@ -249,7 +249,7 @@ proc create*[T, V](this: var Builder[T]; s: V): uoffset = #Both CreateString and
       this.bytes[this.head.int..this.head.int + 1] = s
    result = this.endVector(s.len)
 
-proc finish*[T, V](this: var Builder[T]; rootTable: uoffset) =
+proc finish*[T](this: var Builder[T]; rootTable: uoffset) =
    if this.nested:
       quit("builder is nested")
    this.nested = true

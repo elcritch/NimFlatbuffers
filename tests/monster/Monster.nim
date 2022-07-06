@@ -52,11 +52,11 @@ builder.MonsterAddEquippedType(EquipmentType.Weapon)
 builder.MonsterAddEquipped(axe)
 builder.MonsterAddPath(path)
 ]#
-var orc = builder.MonsterEnd()
+var orc = builder.monsterEnd()
 
-builder.Finish(orc)
+builder.finish(orc)
 
-var finishedBytes = builder.FinishedBytes()
+var finishedBytes = builder.finishedBytes()
 # echo finishedBytes
 
 var aMonster: Monster
