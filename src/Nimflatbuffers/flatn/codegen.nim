@@ -285,7 +285,7 @@ proc newStructCreator(node: Node): NimNode {.used.} =
 
       )
    )
-   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B", newEmptyNode(), newEmptyNode()))
 
 proc newStruct(node: Node): seq[string] =
    var
@@ -689,7 +689,7 @@ proc newTableAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
-   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B", newEmptyNode(), newEmptyNode()))
 
 proc newTableEnumAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -716,7 +716,7 @@ proc newTableEnumAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
-   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B", newEmptyNode(), newEmptyNode()))
 
 proc newTableArrayAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -743,7 +743,7 @@ proc newTableArrayAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
-   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B", newEmptyNode(), newEmptyNode()))
 
 proc newTableUnionTypeAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -770,7 +770,7 @@ proc newTableUnionTypeAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $slo & ", " & field & ", default(" & typ & "))\n"
       )
    )
-   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B", newEmptyNode(), newEmptyNode()))
 
 proc newTableUnionAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -797,7 +797,7 @@ proc newTableUnionAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $(slo + 1) & ", " & field & ", default(" & typ & "))\n"
       )
    )
-   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B", newEmptyNode(), newEmptyNode()))
 
 proc newTableStringAdder(obj, field, typ: string, slo: int): NimNode =
    result = newProc(
@@ -824,7 +824,7 @@ proc newTableStringAdder(obj, field, typ: string, slo: int): NimNode =
          "this.prependSlot(" & $(slo + 1) & ", " & field & ", default(" & typ & "))\n"
       )
    )
-   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B", newEmptyNode(), newEmptyNode()))
 
 proc newTableStarter(objName: string, node: Node): NimNode =
    result = newProc(
@@ -846,7 +846,7 @@ proc newTableStarter(objName: string, node: Node): NimNode =
          "this.startObject(" & $node.children[1].children.len & ")\n"
       )
    )
-   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B: Builder", newEmptyNode(), newEmptyNode()))
+   result[2] = nnkGenericParams.newTree( nnkIdentDefs.newTree( ident "B", newEmptyNode(), newEmptyNode()))
 
 proc newTable(node: Node): seq[string] =
    var

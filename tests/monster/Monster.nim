@@ -42,7 +42,7 @@ discard builder.CreateVec3(4.0, 5.0, 6.0)
 path = builder.EndVector(2)
 ]#
 var name = builder.create("Orc")
-builder.monstersStart()
+builder.monsterStart()
 # builder.monsterAddPos(builder.CreateVec3(1.0, 2.0, 3.0))
 # builder.monsterAddHp(301)
 # builder.monsterAddMana(10)
@@ -56,7 +56,7 @@ builder.MonsterAddEquippedType(EquipmentType.Weapon)
 builder.MonsterAddEquipped(axe)
 builder.MonsterAddPath(path)
 ]#
-var orc = builder.monstersEnd()
+var orc = builder.monsterEnd()
 
 builder.finish(orc)
 

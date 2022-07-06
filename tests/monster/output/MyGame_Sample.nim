@@ -31,7 +31,7 @@ proc z*(this: Vec3): float32 =
 proc `z=`*(this: var Vec3; n: float32; ) =
   structSetter(this, 8, n)
 
-proc createVec3*[B: Builder](this: var B; x: float32; y: float32; z: float32): uoffset =
+proc createVec3*[B](this: var B; x: float32; y: float32; z: float32): uoffset =
   this.prep(4, 12)
   this.prepend(z)
   this.prepend(y)
@@ -66,22 +66,22 @@ proc friendly*(this: Monster): bool =
 proc `friendly=`*(this: var Monster; n: bool) =
   discard this.tab.mutateSlot(12, n)
 
-proc monsterStart*[B: Builder](this: var B) =
+proc monsterStart*[B](this: var B) =
   this.startObject(5)
 
-proc monsterAddPos*[B: Builder](this: var B; pos: uoffset) =
+proc monsterAddPos*[B](this: var B; pos: uoffset) =
   this.prependSlot(0, pos, default(uoffset))
 
-proc monsterAddMana*[B: Builder](this: var B; mana: uoffset) =
+proc monsterAddMana*[B](this: var B; mana: uoffset) =
   this.prependSlot(1, mana, default(uoffset))
 
-proc monsterAddHp*[B: Builder](this: var B; hp: uoffset) =
+proc monsterAddHp*[B](this: var B; hp: uoffset) =
   this.prependSlot(2, hp, default(uoffset))
 
-proc monsterAddName*[B: Builder](this: var B; name: uoffset) =
+proc monsterAddName*[B](this: var B; name: uoffset) =
   this.prependSlot(4, name, default(uoffset))
 
-proc monsterAddFriendly*[B: Builder](this: var B; friendly: uoffset) =
+proc monsterAddFriendly*[B](this: var B; friendly: uoffset) =
   this.prependSlot(4, friendly, default(uoffset))
 
 proc monsterEnd*[T](this: var Builder[T]): uoffset =
@@ -100,13 +100,13 @@ proc damage*(this: Weapon): int16 =
 proc `damage=`*(this: var Weapon; n: int16) =
   discard this.tab.mutateSlot(6, n)
 
-proc weaponStart*[B: Builder](this: var B) =
+proc weaponStart*[B](this: var B) =
   this.startObject(2)
 
-proc weaponAddName*[B: Builder](this: var B; name: uoffset) =
+proc weaponAddName*[B](this: var B; name: uoffset) =
   this.prependSlot(1, name, default(uoffset))
 
-proc weaponAddDamage*[B: Builder](this: var B; damage: int16) =
+proc weaponAddDamage*[B](this: var B; damage: int16) =
   this.prependSlot(1, damage, default(int16))
 
 proc weaponEnd*[T](this: var Builder[T]): uoffset =
